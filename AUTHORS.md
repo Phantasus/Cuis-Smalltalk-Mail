@@ -48,7 +48,7 @@ into `MailStreamer` classes.
 
 The first commit of this work was:
 
->commit e41fb799e9cb699e35079ade052ff7cf23b64cf8 (HEAD -> master)
+>commit ed86a4b2611df5152f172395c7c0a382857cd66d (HEAD -> master)
 >Author: Josef P. Bernhart <git@phantasus.at>
 >Date:   Wed Apr 28 18:06:09 2021 +0200
 >
