@@ -15,7 +15,6 @@ Experimental, DO NOT USE IN PRODUCTION, Design Work ongoing
 - See `AUTHORS.md` for previous Squeak reference implementation of
   Mail related classes (not the MediaType-Kernel).
 
-º
 # License
 
 MIT License
