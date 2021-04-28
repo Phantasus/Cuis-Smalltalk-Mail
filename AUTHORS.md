@@ -38,3 +38,38 @@ The authors of these files were
     - Tim Rowledge (tpr)
     - Levente Uzonyi (ul)
     - Yoshiki Ohshima (yo)
+
+# Refactoring and re-write (28. April 2021)
+
+The refactoring and re-write was done by Josef Philip Bernhart (jpb).
+All the previous MIME targetting MailMessage code was more or less
+thrown away and the reading, parsing code was extracted and put
+into `MailStreamer` classes.
+
+The first commit of this work was:
+
+>commit e41fb799e9cb699e35079ade052ff7cf23b64cf8 (HEAD -> master)
+>Author: Josef P. Bernhart <git@phantasus.at>
+>Date:   Wed Apr 28 18:06:09 2021 +0200
+>
+>    Add initial packages
+>    
+>    1. Adds Mail-Kernel with basic definitions of the MailMessage,
+>       which is basically a new almost 99% re-implementation of
+>       the MailMessage class of Squeak. The good parts used for
+>       reading and parsing were kept in the MessageTokenParser class.
+>       The serialization relevant functionality was re-written and
+>       moved into MailStreamer classes. Like MailLineStreamer or
+>       MailMessageStreamer.
+>    
+>    2. Adds MailMessageHeader class for introspecting headers and
+>       dealing with them as first-class objects.
+>    
+>    3. Adds tests for the basic mail message reading and writing
+>       functionality.
+>    
+>    4. Adds MediaType-Kernel package, which provides media types
+>       and the basis for parsing media types, it's useful for
+>       MIME, Gemini, HTTP and other protocols which need to
+>       read and interpret these specially formatted type tags.
+
