@@ -1,9 +1,9 @@
-'From Cuis 5.0 [latest update: #4567] on 28 April 2021 at 6:14:17 pm'!
+'From Cuis 5.0 [latest update: #4579] on 22 May 2021 at 5:26:29 pm'!
 'Description Provides mail envelope reading and writing
 
 Author: Josef Philip Bernhart (jpb)
 License: MIT'!
-!provides: 'Mail-Kernel' 1 34!
+!provides: 'Mail-Kernel' 1 46!
 SystemOrganization addCategory: 'Mail-Kernel-Tests'!
 SystemOrganization addCategory: 'Mail-Kernel'!
 
@@ -68,6 +68,16 @@ TestCase subclass: #MailMessageHeaderTest
 MailMessageHeaderTest class
 	instanceVariableNames: ''!
 
+!classDefinition: #MailMessageIdDefaultBuilderTest category: 'Mail-Kernel-Tests'!
+TestCase subclass: #MailMessageIdDefaultBuilderTest
+	instanceVariableNames: 'usedClass'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel-Tests'!
+!classDefinition: 'MailMessageIdDefaultBuilderTest class' category: 'Mail-Kernel-Tests'!
+MailMessageIdDefaultBuilderTest class
+	instanceVariableNames: ''!
+
 !classDefinition: #MailMessageStreamerTest category: 'Mail-Kernel-Tests'!
 TestCase subclass: #MailMessageStreamerTest
 	instanceVariableNames: 'usedClass fixtures'
@@ -118,6 +128,16 @@ Object subclass: #MailAddressToken
 MailAddressToken class
 	instanceVariableNames: ''!
 
+!classDefinition: #MailEditor category: 'Mail-Kernel'!
+Object subclass: #MailEditor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel'!
+!classDefinition: 'MailEditor class' category: 'Mail-Kernel'!
+MailEditor class
+	instanceVariableNames: ''!
+
 !classDefinition: #MailMessage category: 'Mail-Kernel'!
 Object subclass: #MailMessage
 	instanceVariableNames: 'body headers'
@@ -126,6 +146,26 @@ Object subclass: #MailMessage
 	category: 'Mail-Kernel'!
 !classDefinition: 'MailMessage class' category: 'Mail-Kernel'!
 MailMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailRegistry category: 'Mail-Kernel'!
+Object subclass: #MailRegistry
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel'!
+!classDefinition: 'MailRegistry class' category: 'Mail-Kernel'!
+MailRegistry class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailSender category: 'Mail-Kernel'!
+Object subclass: #MailSender
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel'!
+!classDefinition: 'MailSender class' category: 'Mail-Kernel'!
+MailSender class
 	instanceVariableNames: ''!
 
 !classDefinition: #MailStreamer category: 'Mail-Kernel'!
@@ -168,12 +208,35 @@ MailStreamer subclass: #MailMessageStreamer
 MailMessageStreamer class
 	instanceVariableNames: ''!
 
+!classDefinition: #MessageIdBuilder category: 'Mail-Kernel'!
+Object subclass: #MessageIdBuilder
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel'!
+!classDefinition: 'MessageIdBuilder class' category: 'Mail-Kernel'!
+MessageIdBuilder class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailMessageIdStyle1Builder category: 'Mail-Kernel'!
+MessageIdBuilder subclass: #MailMessageIdStyle1Builder
+	instanceVariableNames: 'domainName time additionalData'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel'!
+!classDefinition: 'MailMessageIdStyle1Builder class' category: 'Mail-Kernel'!
+MailMessageIdStyle1Builder class
+	instanceVariableNames: ''!
+
 
 !MailMessageHeader commentStamp: '<historical>' prior: 0!
 I represent a mail message header as defined in standards like in RFC 5322!
 
 !MailAddressTokenizer commentStamp: '<historical>' prior: 0!
 Divides an address into tokens, as specified in RFC 822.  Used by MailAddressParser.!
+
+!MailMessageIdDefaultBuilderTest commentStamp: '<historical>' prior: 0!
+Tests different message-id generation styles!
 
 !MailAddressParser commentStamp: '<historical>' prior: 0!
 Parse mail addresses.  The basic syntax is:
@@ -188,6 +251,12 @@ a single token from an RFC822 mail address.  Used internally in MailAddressParse
 !MailMessage commentStamp: '<historical>' prior: 0!
 I represent a Internet mail or news message as defined in RFC 5322, which does not include media types (MIME types), attachments, pictures or similiar additions!
 
+!MailRegistry commentStamp: '<historical>' prior: 0!
+A registry for the mail kernel, it contains global shared utility functionalities!
+
+!MailSender commentStamp: '<historical>' prior: 0!
+Represents a mechanism, which is able to send mail.!
+
 !MailStreamer commentStamp: '<historical>' prior: 0!
 Baseclass for "streamers" (classes which work on streams and do reading and writing operations) in relation to internet mail messages (also known as E-Mail)!
 
@@ -197,6 +266,12 @@ This streamer reads or writes lines of a mail message as defined in RFC 5322. It
 !MailMessageStreamer commentStamp: '<historical>' prior: 0!
 Streamer for reading and writing E-Mail message envelopes according to RFC 5322!
 
+!MessageIdBuilder commentStamp: '<historical>' prior: 0!
+Represents a builder for message-ids, as some systems use UUIDs, Matt Curtin / Jamie Zawinski styled IDs or other means, it could be interesting for people to provide a different implementation for a message-id generation mechanism, not that it's expected that this will happen often.!
+
+!MailMessageIdStyle1Builder commentStamp: '<historical>' prior: 0!
+Builds message-ids as recommended by https://datatracker.ietf.org/doc/html/draft-ietf-usefor-message-id-01!
+
 !MailAddressToken methodsFor: 'printing' stamp: 'ls 9/12/1998 20:40'!
 printOn: aStream
 	aStream nextPut: $[.
@@ -204,9 +279,6 @@ printOn: aStream
 	aStream nextPut: $|.
 	aStream nextPutAll: self text.
 	aStream nextPut: $].! !
-
-!MailMessageHeader methodsFor: 'as yet unclassified' stamp: 'jpb 4/27/2021 16:25:25'!
-storeOnMailMessageUsing: aStreamer! !
 
 !MailMessageHeader methodsFor: 'testing' stamp: 'jpb 4/27/2021 16:24:09'!
 is: queryName
@@ -429,7 +501,7 @@ peekChar
 skipSeparators
 	pos _ text indexOfAnyOf: CharacterSet nonSeparators  startingAt: pos  ifAbsent: [ text size + 1 ].! !
 
-!MailAddressTokenizer class methodsFor: 'class initialization' stamp: 'jpb 4/23/2021 10:20:25'!
+!MailAddressTokenizer class methodsFor: 'class initialization' stamp: 'jpb 5/5/2021 13:38:12'!
 newAtomSet
 	"Create a ByteCharacterSet to ensure quick parsing of the email address string, which must be a ByteString (UTF-8 encoded)"
 
@@ -440,7 +512,8 @@ newAtomSet
 		addAll: ($0 to: $9);
 		addAll: '!!#$%&''*+-/=?^_`{|}~';
 		"RFC 6531 allows characters with value > 127 encoded as UTF-8, which means values between 128 and 255 may appear as part of atoms."
-		addAll: ((Character asciiValue: 128) to: (Character asciiValue: 255))! !
+		addAll: ((Character asciiValue: 128) to: (Character asciiValue: 255));
+		yourself! !
 
 !MailAddressTokenizer class methodsFor: 'class initialization' stamp: 'jpb 4/23/2021 10:20:55'!
 nonAtomSet
@@ -470,6 +543,64 @@ tokensIn: aString
 !MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 4/27/2021 20:22:29'!
 setUp
 	usedClass _ MailAddressParser ! !
+
+!MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/21/2021 22:51:35'!
+testReadingDomainNames3
+	| addresses |
+	
+	addresses _ usedClass domainNamesIn: 'Mary Smith <mary@x.test>, jdoe@example.org, Who? <one@y.test>'.
+	
+	self assert: 3 equals: addresses size.
+	self assert: 'x.test' equals: (addresses at: 1).
+	self assert: 'example.org' equals: (addresses at: 2).
+	self assert: 'y.test' equals: (addresses at: 3).! !
+
+!MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/21/2021 22:52:06'!
+testReadingDomainNames4
+	| addresses |
+	
+	addresses _ usedClass domainNamesIn: '"Joe Q. Public" <john.q.public@example.com>'.
+	
+	self assert: 1 equals: addresses size.
+	self assert: 'example.com' equals: (addresses at: 1).
+! !
+
+!MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/21/2021 22:52:36'!
+testReadingDomainNames5
+	| addresses |
+	
+	addresses _ usedClass domainNamesIn: '<boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net>'.
+	
+	self assert: 2 equals: addresses size.
+	self assert: 'nil.test' equals: (addresses at: 1).
+	self assert: 'example.net' equals: (addresses at: 2).
+! !
+
+!MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/21/2021 22:53:22'!
+testReadingDomainNames6
+	| addresses |
+	
+	addresses _ usedClass domainNamesIn: 'Undisclosed recipients:;'.
+	
+	self assert: 0 equals: addresses size.! !
+
+!MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/21/2021 22:49:10'!
+testReadingMailAddressDomains1
+	| domains |
+	"Taken from https://tools.ietf.org/html/rfc5322#appendix-A.6.1"
+	domains _ usedClass domainNamesIn: 'Mary Smith <@node.test:mary@example.net>, , jdoe@test  . example'.
+	
+	self assert: 2 equals: domains size.
+	self assert: '@node.test:mary@example.net' equals: (domains at: 1).
+	self assert: 'test.example' equals: (domains at: 2).! !
+
+!MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/21/2021 22:50:32'!
+testReadingMailAddressDomains2
+	| domains |
+	domains _ usedClass domainNamesIn: 'John Doe <jdoe@machine.example>'.
+	
+	self assert: 1 equals: domains size.
+	self assert: 'machine.example' equals: domains first.! !
 
 !MailAddressParserTest methodsFor: 'as yet unclassified' stamp: 'jpb 4/27/2021 20:26:16'!
 testReadingRfcExample1
@@ -919,6 +1050,35 @@ testTraceFieldTesting
 	self assert: header isUnstructuredField not.
 	self assert: header isOptionalField not.! !
 
+!MailMessageIdDefaultBuilderTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/22/2021 09:54:31'!
+setUp
+	usedClass _ MailMessageIdStyle1Builder ! !
+
+!MailMessageIdDefaultBuilderTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/22/2021 09:57:19'!
+testGeneratingDefaultMessageId
+	| builder |
+	
+	builder _ usedClass new.
+	builder domainName: 'example.net'.
+	builder time: (DateAndTime year: 2021 month: 5 day: 22 hour: 9 minute: 55).
+	builder additionalData: 200.
+	
+	self assert: '<1K55M91J00.5K@example.net>' equals: builder buildMessageId.! !
+
+!MailMessageIdDefaultBuilderTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/22/2021 10:04:44'!
+testGeneratingDefaultMessageId2
+	| builder messageId |
+	
+	builder _ usedClass new.
+	builder domainName: 'example.net'.
+	
+	messageId _ builder findNewMessageId.
+	
+	self assert: messageId size >= '<xx.xx@example.net>' size.
+	self assert: 'example.net>' equals: (messageId copyAfter: $@).
+	self assert: $< equals: (messageId at: 1).
+	! !
+
 !MailMessageStreamerTest methodsFor: 'as yet unclassified' stamp: 'jpb 4/28/2021 16:53:11'!
 newHeader: headerName value: headerValue
 	^MailMessageHeader key: headerName value: headerValue! !
@@ -1007,6 +1167,22 @@ testCreatingEmpty
 	self assert: message messageId isEmpty.
 	
 	self assert: message isSendable not.! !
+
+!MailMessageTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/5/2021 13:58:35'!
+testCreatingMinimalSendableMessage
+	| message |
+	message _ usedClass new.
+	
+	message to: 'Mary Smith <mary@example.net>'.
+	message from: 'John Doe <jdoe@machine.example>'.
+	message date: 'Fri, 21 Nov 1997 09:55:06 -0600'.
+	
+	self assert: message from isEmpty not.
+	self assert: message to isEmpty not.
+	self assert: message date isEmpty not.
+	self assert: message body isEmpty.
+	
+	self assert: message isSendable.! !
 
 !MailTestFixtures methodsFor: 'as yet unclassified' stamp: 'jpb 4/28/2021 17:30:21'!
 newMessageText: lines
@@ -1254,6 +1430,15 @@ addressesIn: aString
 	tokens _ MailAddressTokenizer tokensIn: aString.
 	^(self new initializeWith: tokens) grabAddresses! !
 
+!MailAddressParser class methodsFor: 'parsing' stamp: 'jpb 5/21/2021 22:47:30'!
+domainNamesIn: aString
+	"Returns the domain names in a given string, which contains mail addresses"
+
+	| addressList | 
+	addressList _ self addressesIn: aString.
+	
+	^addressList collect: [:mailAddress | mailAddress copyAfter: $@ ]! !
+
 !MailAddressToken methodsFor: 'access' stamp: 'ls 9/12/1998 20:42'!
 text
 	^text! !
@@ -1302,6 +1487,12 @@ headersNamed: fieldName do: aBlock
 		headerField key = fieldName
 			ifTrue: [ aBlock value: headerField ]].! !
 
+!MailMessage methodsFor: 'header fields' stamp: 'jpb 5/5/2021 11:29:39'!
+newHeaderNamed: headerName
+	"Creates a new header for use in this message model. Here specific kinds of header fields could be created for special kind of mail messages (e.g MIME based messages with attachments)"
+	
+	^self class newHeaderNamed: headerName. ! !
+
 !MailMessage methodsFor: 'header fields' stamp: 'jpb 4/28/2021 10:49:19'!
 removeHeaderNamed: name
 	"remove all fields with the specified name"
@@ -1341,9 +1532,9 @@ writeTo: outputStream
 isEmpty
 	^headers isEmpty and: [ body isEmpty ]! !
 
-!MailMessage methodsFor: 'testing' stamp: 'jpb 4/28/2021 16:45:48'!
+!MailMessage methodsFor: 'testing' stamp: 'jpb 5/5/2021 10:39:54'!
 isSendable
-	"Returns true if the message could be send out with some mail sendin g mechanis as it's in a proper form for doing so"
+	"Returns true if the message could be send out with some mail sending mechanism as it's in a proper form for doing so"
 	| withDate withFrom withTo |
 	withDate _ 0.
 	withFrom _ 0.
@@ -1370,29 +1561,43 @@ body
 	"return just the body of the message"
 	^body asString! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 11:03:16'!
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 10:47:25'!
 cc
-	^self findHeaderNamed: 'Cc' ifAbsent: [ ^'' ].! !
+	^(self findHeaderNamed: 'Cc' ifAbsent: [ ^'' ]) value.! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 08:57:38'!
-cc: commaSeperatedListOfEmailAddresses
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 14:01:51'!
+cc: anObject
 	self notYetImplemented ! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 10:51:07'!
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 11:35:19'!
 date
-	| dateField |
-	dateField _ (self findHeaderNamed: 'date' ifAbsent: [ ^0 ]) value.
+	^(self findHeaderNamed: 'Date' ifAbsent: [ ^'' ]) value! !
+
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 14:02:13'!
+date: anObject 
+	| foundHeader |
+	foundHeader _ self findHeaderNamed: 'Date' 
+		ifAbsent: [ | newHeader | 
+			newHeader _ self newHeaderNamed: 'Date'.
+			self addHeader: newHeader.
+			newHeader  ].
 	
-	^ [MailDateStreamer readTimeFrom: dateField readStream]
-		ifError: [:err :rcvr | DateAndTime now ].! !
+	foundHeader value: anObject.! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 10:59:14'!
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 11:26:53'!
 from
-	^(self findHeaderNamed: 'from' ifAbsent: [ ^'' ]) value! !
+	^(self findHeaderNamed: 'From' ifAbsent: [ ^'' ]) value! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 08:57:53'!
-from: aString
-	self notYetImplemented ! !
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 14:02:33'!
+from: anObject
+	| foundHeader |
+	foundHeader _ self findHeaderNamed: 'From' ifAbsent: [
+		| newHeader |
+		newHeader _  self newHeaderNamed: 'From'.
+		self addHeader: newHeader.
+		newHeader ].
+	
+	foundHeader value: anObject.! !
 
 !MailMessage methodsFor: 'accessing' stamp: 'jpb 4/27/2021 16:03:03'!
 headers
@@ -1437,59 +1642,36 @@ replySubject
 		ifTrue: [self subject]
 		ifFalse: ['Re: ' , self subject].! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 10:51:07'!
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 10:46:48'!
 subject
 
-	^ (self findHeaderNamed: 'subject' ifAbsent: [ ^'' ])  mainValue! !
+	^ (self findHeaderNamed: 'subject' ifAbsent: [ ^'' ])  value! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 08:58:06'!
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/22/2021 16:33:53'!
 subject: aString
-	self notYetImplemented ! !
-
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/27/2021 16:00:15'!
-text
+	| foundHeader |
+	foundHeader _ self findHeaderNamed: 'Subject' 
+		ifAbsent: [ | newHeader | 
+			newHeader _ self newHeaderNamed: 'Subject'.
+			self addHeader: newHeader.
+			newHeader  ].
 	
-	^ String streamContents: [ :str | | encodedBodyText |
-		"first put the header"
-		(headers associations , {'content-type' -> {self body contentTypeHeaderValue} })
-				do: [ :assoc  | | fieldName fieldValues | 
-					fieldName _ assoc key.
-					fieldValues _ assoc value.
-					fieldValues do: [ :fieldValue |
-						str
-							nextPutAll: fieldName capitalized ;
-							nextPutAll: ': ';
-							nextPutAll: fieldValue asHeaderValue;
-							cr ]].
-		
-		 self body contentTransferEncodingHeaderValue 
-			ifNotNil: [:headerValue |
-				str
-					nextPutAll: 'content-transfer-encoding' capitalized;
-					nextPutAll: ': ';
-					nextPutAll: headerValue asHeaderValue;
-					cr  ].
-		
-		"skip a line between header and body"
-		str cr.
+	foundHeader value: aString.! !
 
-		"put the body, being sure to encode it according to the header"
-		encodedBodyText _ body asSendableBodyText.
-		str nextPutAll: encodedBodyText ].! !
-
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 11:02:49'!
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 10:46:59'!
 to
-	^self findHeaderNamed: 'To' ifAbsent: [^'' ]! !
+	^(self findHeaderNamed: 'To' ifAbsent: [^'' ]) value! !
 
-!MailMessage methodsFor: 'accessing' stamp: 'jpb 4/28/2021 08:58:14'!
-to: aString
-	self notYetImplemented ! !
-
-!MailMessage class methodsFor: 'instance creation' stamp: 'jpb 4/23/2021 10:22:04'!
-from: aString
-	"Initialize a new instance from the given string."
-
-	^self new initializeFromString: aString! !
+!MailMessage methodsFor: 'accessing' stamp: 'jpb 5/5/2021 14:02:54'!
+to: anObject
+	| foundHeader |
+	foundHeader _ self findHeaderNamed: 'To'
+		 ifAbsent: [ | newHeader | 
+			newHeader _ self newHeaderNamed: 'To'.
+			self addHeader: newHeader.
+			newHeader ].
+	
+	foundHeader value: anObject.! !
 
 !MailMessage class methodsFor: 'preferences' stamp: 'jpb 4/22/2021 21:06:50'!
 omittedHeaderFields
@@ -1547,6 +1729,25 @@ omittedHeaderFields
 			'list-archive'
 		)
 ! !
+
+!MailMessage class methodsFor: 'header fields' stamp: 'jpb 5/5/2021 11:32:37'!
+findHeaderNameByString: aString
+	"Finds the header name for this kind of mail message. This is a customization hook which redirects to the specific implementation for retrieving the header name"
+
+	^MailMessageHeader findHeaderNameByString: aString! !
+
+!MailMessage class methodsFor: 'header fields' stamp: 'jpb 5/5/2021 11:33:20'!
+newHeaderNamed: headerName
+	"Creates a new header for use in this message model. Here specific kinds of header fields could be created for special kind of mail messages (e.g MIME based messages with attachments)"
+	
+	^MailMessageHeader
+		key: (self findHeaderNameByString: headerName asString)
+		value: ''! !
+
+!MailSender methodsFor: 'mail sending' stamp: 'jpb 5/22/2021 10:45:44'!
+sendMessage: aMailMessage
+	"Takes the given mail message and sends it out"
+	self subclassResponsibility.! !
 
 !MailStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 4/23/2021 18:50:11'!
 atEnd
@@ -1958,3 +2159,73 @@ newMessage
 !MailMessageStreamer class methodsFor: 'as yet unclassified' stamp: 'jpb 4/28/2021 13:51:08'!
 on: newStream
 	^super on: (MailLineStreamer on: newStream).! !
+
+!MessageIdBuilder methodsFor: 'builder' stamp: 'jpb 5/21/2021 21:22:14'!
+findNewMessageId
+	self subclassResponsibility ! !
+
+!MessageIdBuilder methodsFor: 'as yet unclassified' stamp: 'jpb 5/22/2021 09:20:22'!
+findNewMessageIdForMessage: mailMessage
+	self subclassResponsibility ! !
+
+!MailMessageIdStyle1Builder methodsFor: 'builder' stamp: 'jpb 5/22/2021 09:25:22'!
+buildMessageId
+	"Builds a message-id together based on the current state"
+	| localPart domainPart |
+		
+	localPart _ self findMessageIdLocalPart.
+	domainPart _ self findDomainPart.
+
+	^'<' , localPart , '@' , domainPart , '>'! !
+
+!MailMessageIdStyle1Builder methodsFor: 'builder' stamp: 'jpb 5/21/2021 22:32:50'!
+findDomainPart
+	"Returns the domain part of a message-id"
+	^domainName ifNil: [ 'localhost' ]! !
+
+!MailMessageIdStyle1Builder methodsFor: 'builder' stamp: 'jpb 5/22/2021 09:18:41'!
+findMessageIdLocalPart
+	"Returns a message at the specific dateTime and seed"
+	^String streamContents: [:stream |
+		time yearNumber printOn: stream base: 36.
+		time monthIndex printOn: stream base: 36.
+		time dayOfMonth printOn: stream base: 36.
+		time hour24 printOn: stream base: 36.
+		time minute printOn: stream base: 36.
+		time second printOn: stream base: 36.
+		(time nanoSecond // 1000) printOn: stream base: 36.
+	
+		stream nextPut: $..
+	
+		additionalData printOn: stream base: 36.
+	].
+	! !
+
+!MailMessageIdStyle1Builder methodsFor: 'builder' stamp: 'jpb 5/22/2021 09:24:42'!
+findNewMessageId
+	"Returns a fresh message-id, generated with the current time"
+
+	time _ DateAndTime now.
+	additionalData _ (2 raisedTo: 64) atRandom.
+	
+	^self buildMessageId ! !
+
+!MailMessageIdStyle1Builder methodsFor: 'builder' stamp: 'jpb 5/22/2021 09:22:19'!
+findNewMessageIdForMessage: mailMessage
+	"Returns a new message-id for the given mail message"
+	domainName _ (MailAddressParser domainNamesIn: mailMessage from) first.
+	
+	^self findNewMessageId ! !
+
+!MailMessageIdStyle1Builder methodsFor: 'accessing' stamp: 'jpb 5/22/2021 09:19:28'!
+additionalData: newSalt
+	additionalData _ newSalt! !
+
+!MailMessageIdStyle1Builder methodsFor: 'accessing' stamp: 'jpb 5/22/2021 09:24:14'!
+domainName: newDomainName
+	"Sets the domain part used for generating a message-id"
+	domainName _ newDomainName ! !
+
+!MailMessageIdStyle1Builder methodsFor: 'accessing' stamp: 'jpb 5/22/2021 09:19:05'!
+time: newTime
+	time _ newTime! !
