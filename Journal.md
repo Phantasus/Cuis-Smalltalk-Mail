@@ -84,7 +84,7 @@ browser := MailBrowserWindow open: model label: 'Laurel Demo'.
 
 This then looks roughly like:
 
-![Screenshot showing a three paned mail client](Assets/Journal/screenshot_laurel_20210526.png "Laurel like browser")
+![Screenshot showing a three paned mail client](Assets/screenshot_laurel_20210526.png "Laurel like browser")
 
 
 # 5. May 2021 (jpb)
