@@ -1,9 +1,9 @@
-'From Cuis 5.0 [latest update: #4579] on 26 May 2021 at 10:40:32 am'!
+'From Cuis 5.0 [latest update: #4579] on 26 May 2021 at 11:57:06 am'!
 'Description Provides mail envelope reading and writing
 
 Author: Josef Philip Bernhart (jpb)
 License: MIT'!
-!provides: 'Mail-Kernel' 1 57!
+!provides: 'Mail-Kernel' 1 58!
 SystemOrganization addCategory: 'Mail-Kernel-Tests'!
 SystemOrganization addCategory: 'Mail-Kernel'!
 
@@ -803,6 +803,23 @@ testReadingTimeFormat1
 	
 	self assert: expected equals: reader nextDateAndTime.	
 	self assert: expected equals: (usedClass readTimeFrom:  'Thu, 22 Jun 2000 14:17:47 -500' readStream)! !
+
+!MailDateStreamerTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/26/2021 11:38:47'!
+testWritingDateAndTime1
+	| dateTime result streamer |
+	
+	dateTime _ DateAndTime
+		year: 2021
+		month: 5
+		day: 26
+		hour: 11
+		minute: 36.
+		
+	result _ '' writeStream.
+	streamer _ usedClass on: result.
+	streamer nextPut: dateTime.
+		
+	self assert: 'Wed, 26 May 2021, 11:36:00 +0000' equals: result contents.! !
 
 !MailLineStreamerTest methodsFor: 'as yet unclassified' stamp: 'jpb 4/26/2021 14:46:14'!
 setUp
@@ -1636,10 +1653,10 @@ mailSender: newSender
 	"Overwrites a new mail sender, so that editted mails can actually be sent out"
 	mailSender _ newSender.! !
 
-!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/25/2021 22:39:20'!
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/26/2021 11:27:29'!
 newMail
 	"Creates a new mail form, for editing"
-	newMailMessage _ MailMessage new.
+	newMailMessage _ self newMailMessage.
 	
 	self changed: #newMailContents! !
 
@@ -1675,6 +1692,22 @@ newMailContents: aString
 	
 	^true
 	! !
+
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/26/2021 11:31:23'!
+newMailMessage
+	"Creates a new mail message object used for starting new mail"
+	| newMessage dateString |
+	newMessage _ MailMessage new.
+	dateString _ String streamContents: [:stringStream |
+		| dateStreamer |
+		dateStreamer _ MailDateStreamer on: stringStream.		
+		dateStreamer nextPut: DateAndTime now.
+	].
+	
+	newMessage date: dateString.
+	
+	
+	^newMessage! !
 
 !MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/25/2021 23:17:23'!
 sendMail
@@ -2571,6 +2604,38 @@ nextDate
 !MailDateStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 4/23/2021 19:15:31'!
 nextDateAndTime 
 	^DateAndTime fromSeconds: self nextTimeEpoch  + (Date newDay: 1 year: 1980) secondsSinceSqueakEpoch! !
+
+!MailDateStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 5/26/2021 11:55:04'!
+nextPut: anObject
+	"Thu, 22 Jun 2000 14:17:47 -500'"
+	
+	| weekDays monthNames utcOffset |
+	
+	weekDays _ #('Sun' 'Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat').
+	monthNames _ #('Jan' 'Feb' 'Mar' 'Apr' 'May' 'Jun' 'Jul' 'Aug' 'Sep' 'Oct' 'Nov' 'Dec').
+	
+	currentStream nextPutAll:  (weekDays at: anObject dayOfWeek + 1).
+	currentStream nextPutAll: ', '.
+	
+	anObject dayOfMonth  printOn: currentStream length: 2 zeroPadded: true.
+	currentStream nextPutAll: ' '.
+	currentStream nextPutAll: (monthNames at: anObject monthIndex).
+	
+	currentStream nextPutAll: ' '.
+	anObject yearNumber printOn: currentStream.
+	currentStream nextPutAll: ', '.
+	
+	anObject printHMSOn: currentStream.
+	
+	currentStream nextPutAll: ' '.	
+	utcOffset _ anObject offset.
+	
+	utcOffset positive
+		ifTrue: [ currentStream nextPut: $+ ]
+		ifFalse: [ currentStream nextPut: $- ].
+		
+	utcOffset hours printOn: currentStream length: 2 zeroPadded: true.
+	utcOffset minutes printOn: currentStream length: 2 zeroPadded: true.! !
 
 !MailDateStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 4/23/2021 19:22:00'!
 nextTimeEpoch
