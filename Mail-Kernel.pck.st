@@ -1,9 +1,9 @@
-'From Cuis 5.0 [latest update: #4579] on 26 May 2021 at 11:57:06 am'!
+'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 6:51:28 pm'!
 'Description Provides mail envelope reading and writing
 
 Author: Josef Philip Bernhart (jpb)
 License: MIT'!
-!provides: 'Mail-Kernel' 1 58!
+!provides: 'Mail-Kernel' 1 59!
 SystemOrganization addCategory: 'Mail-Kernel-Tests'!
 SystemOrganization addCategory: 'Mail-Kernel'!
 
@@ -160,7 +160,7 @@ MailMessage class
 
 !classDefinition: #MailRecord category: 'Mail-Kernel'!
 Object subclass: #MailRecord
-	instanceVariableNames: 'identifier repository'
+	instanceVariableNames: 'repository'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Kernel'!
@@ -170,7 +170,7 @@ MailRecord class
 
 !classDefinition: #MaildirRecord category: 'Mail-Kernel'!
 MailRecord subclass: #MaildirRecord
-	instanceVariableNames: 'createdAt flags mailContents'
+	instanceVariableNames: 'createdAt flags mailContents cachedFields identifier'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Kernel'!
@@ -305,7 +305,9 @@ A model for browsing mail!
 I represent a Internet mail or news message as defined in RFC 5322, which does not include media types (MIME types), attachments, pictures or similiar additions!
 
 !MailRecord commentStamp: '<historical>' prior: 0!
-Represents a record within a mail message repository, it knows how to read itself from the repository!
+Represents a record within a mail message repository, it knows how to read itself from the repository as it's supposed to be lazily loaded or eagerly loaded with it's full mail message content.
+
+Mail records are used within the MailBrowser model to display the entries in the repository and can be reduced to just needed cached fields by calling #forgetCachedMail.!
 
 !MaildirRecord commentStamp: '<historical>' prior: 0!
 Represents a mail record within a maildir on-disk repository.!
@@ -1613,24 +1615,33 @@ isRefetchNeeded
 	
 	^(recordsListFetchedAt + 5 minutes) < DateAndTime now! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 22:02:16'!
+!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 18:14:29'!
 mailRecordsList
 	self isRefetchNeeded ifTrue: [ self fetchRecordsList ].
 		
-	^recordsList ! !
+	^recordsList! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 22:02:29'!
-selectedMailContents
+!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 08:45:36'!
+selectedMailContents	
+	| foundRecord |
+	
+	foundRecord _ self selectedMailMessage.
+	
+	foundRecord isEmpty ifTrue: [ ^'' ].
+
+	^self formatMailMessage: foundRecord ! !
+
+!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 09:49:08'!
+selectedMailMessage
 	| foundRecord |	
-	recordsList isEmpty ifTrue: [ ^'' ].
-	mailSelectionIndex isNil ifTrue: [ ^'' ].
-	mailSelectionIndex <= 0 ifTrue: [ ^'' ].
 	
-	foundRecord _ recordsList at: mailSelectionIndex ifAbsent: [ ^'' ].
+	recordsList isEmpty ifTrue: [ ^MailMessage new ].
+	mailSelectionIndex isNil ifTrue: [ ^MailMessage new ].
+	mailSelectionIndex <= 0 ifTrue: [ ^MailMessage new ].
 	
-	^self formatMailMessage: foundRecord mail.
+	foundRecord _ recordsList at: mailSelectionIndex ifAbsent: [ ^MailMessage new ].
 	
-	! !
+	^foundRecord mailMessage.! !
 
 !MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:46:21'!
 selectedMailRecordIndex
@@ -1652,6 +1663,35 @@ mailRepository: newRepository
 mailSender: newSender
 	"Overwrites a new mail sender, so that editted mails can actually be sent out"
 	mailSender _ newSender.! !
+
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/27/2021 09:12:52'!
+forwardSelectedMail
+	"Creates a reply to the currently selected mail"
+	| selectedMessage |
+	
+	selectedMessage _ self selectedMailMessage.
+	newMailMessage _ self newMailMessage.
+	
+	newMailMessage subject: selectedMessage subject asString.
+	newMailMessage body: (self newForwardedMessageBody: selectedMessage).
+	
+	self changed: #newMailContents.! !
+
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/27/2021 09:20:44'!
+newForwardedMessageBody: mailMessage
+	"Returns a new body for forwarding the given mail message"
+	
+	| newBody line endText startText newLine |
+	
+	newLine _ String newLineString.
+	line _ String streamContents: [:str | 20 timesRepeat: [ str nextPut: $- ]]. 
+	
+	endText _ line , ' End of forwarded message ' , line.
+	startText _ line , ' Start of forwarded message ' , line.
+	
+	newBody _ startText , newLine , mailMessage body , endText , newLine.
+	
+	^newBody! !
 
 !MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/26/2021 11:27:29'!
 newMail
@@ -1708,6 +1748,45 @@ newMailMessage
 	
 	
 	^newMessage! !
+
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/27/2021 09:30:20'!
+newQuotedMessageBody: mailMessage
+	"Returns a quoted message body of the given mail message"
+	
+	| quotedBody newLine startText |
+	startText _ mailMessage from asString , ' writes:'.
+	
+	newLine _ String newLineString.
+	
+	quotedBody _ String streamContents: [:newBody| 
+		mailMessage body asString linesDo: [:bodyLine |
+			newBody nextPutAll: '> '.
+			newBody nextPutAll: bodyLine.
+			newBody nextPutAll: newLine.
+		].
+	].
+	
+	^startText , newLine , quotedBody! !
+
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/27/2021 09:45:53'!
+replyToSelectedMail
+	"Creates a reply to the currently selected mail"
+	| selectedMessage replyDestination replyToHeader |
+	
+	selectedMessage _ self selectedMailMessage.
+	newMailMessage _ self newMailMessage.
+	
+	replyToHeader _ selectedMessage findHeaderNamed: 'Reply-To'  ifAbsent: nil.
+	replyDestination _ replyToHeader isNil
+		ifTrue: [ selectedMessage from ]
+		ifFalse: [ replyToHeader value ].
+	
+	newMailMessage to: replyDestination.
+	newMailMessage from: selectedMessage to.
+	newMailMessage subject: 'Re: ' , selectedMessage subject.
+	newMailMessage body: (self newQuotedMessageBody: selectedMessage).
+	
+	self changed: #newMailContents.! !
 
 !MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/25/2021 23:17:23'!
 sendMail
@@ -2010,15 +2089,37 @@ newHeaderNamed: headerName
 		key: (self findHeaderNameByString: headerName asString)
 		value: ''! !
 
+!MailRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 11:21:52'!
+forgetCachedMail
+	"Forgets any cached mail, which was loaded from the repository (e.g database, files, etc)"! !
+
+!MailRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 11:13:58'!
+mailMessage
+	"Returns the mail message associated with this record. This could mean loading it from a database or file"
+	self subclassResponsibility.! !
+
+!MailRecord methodsFor: 'accessing' stamp: 'jpb 5/27/2021 11:19:24'!
+repository: newRepository
+	"Sets the repository of which this record is obtained"
+	repository _ newRepository.! !
+
 !MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:08:57'!
 addFlag: newFlag
 	flags _ flags , { newFlag }! !
 
-!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:14:32'!
+!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 10:22:19'!
 displayStringOrText
 	"Returns a meaningfull representation of the mailrecord within the repository"
-	| spaceChar |
+	| spaceChar subjectField subjectLength |
 	spaceChar _ Character space.
+	subjectField _ identifier.
+	subjectLength _ 50.
+	
+	cachedFields isNil
+		ifFalse: [ subjectField _ cachedFields at: 'Subject' ].
+	
+	subjectField size > subjectLength 
+		ifTrue: [ subjectField _ (subjectField copyFrom: 1 to: subjectLength - 5) , ' ...' ].
 	
 	^String streamContents: [:stringStream |
 		"iso date"
@@ -2028,10 +2129,10 @@ displayStringOrText
 		5 timesRepeat: [ 		stringStream nextPut: spaceChar ].
 		
 		"identifier"
-		stringStream nextPutAll: identifier.
+		stringStream nextPutAll: subjectField.
 			
 		"spacing"
-		(40 - identifier size) + 5 timesRepeat: [ 		stringStream nextPut: spaceChar ].
+		(subjectLength - subjectField size) + 5 timesRepeat: [ 		stringStream nextPut: spaceChar ].
 		
 		"flags"
 		stringStream nextPut: $(.
@@ -2039,15 +2140,27 @@ displayStringOrText
 		stringStream nextPut: $).
 	]! !
 
-!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:28:13'!
-mail
-	"Fetches the mail contents from the on-disk maildir repository"
-	[ ^repository findMailByIdentifier: identifier ]
-		on: Error do: [ ^MailMessage new ]
+!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 10:18:45'!
+findCachedFieldsWith: mailMessage
+	mailMessage isNil ifTrue: [ ^self ].
+	mailMessage isEmpty ifTrue: [ ^self ].
 	
-	! !
+	cachedFields _ Dictionary new.
+	
+	cachedFields at: 'From' put: mailMessage from.
+	cachedFields at: 'To' put: mailMessage to.
+	cachedFields at: 'Subject' put: mailMessage subject.! !
 
-!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:59:33'!
+!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 09:55:00'!
+forgetCachedMail
+	mailContents _ nil! !
+
+!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 09:54:46'!
+hasCachedMail
+	"Returns true if the on-disk mail message has been cached in the record"
+	^mailContents isNil not! !
+
+!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 10:06:48'!
 mailContents
 	"Fetches the mail contents from the on-disk maildir repository"
 	
@@ -2059,6 +2172,27 @@ mailContents
 			
 	^mailContents
 	! !
+
+!MaildirRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 10:22:27'!
+mailMessage
+	"Fetches the mail contents from the on-disk maildir repository"
+	| streamer lineStream foundMail |
+	
+	[ 
+		
+		streamer _ MailMessageStreamer new.
+		lineStream _ MailLineStreamer on:  self mailContents readStream.
+		lineStream beTolerant.
+		
+		streamer setStream: lineStream.
+		foundMail _ streamer next.
+		
+		cachedFields isNil
+			ifTrue: [ self findCachedFieldsWith: foundMail ].
+		
+		^foundMail
+	]
+	on: Error do: [ ^MailMessage new ]! !
 
 !MaildirRecord methodsFor: 'accessing' stamp: 'jpb 5/25/2021 21:53:46'!
 <= aMaildirRecord 
@@ -2079,10 +2213,6 @@ flags: anArray
 !MaildirRecord methodsFor: 'accessing' stamp: 'jpb 5/25/2021 18:30:51'!
 identifier: newIdentifier
 	identifier _ newIdentifier ! !
-
-!MaildirRecord methodsFor: 'accessing' stamp: 'jpb 5/25/2021 18:31:13'!
-repository: newRepository
-	repository _ newRepository.! !
 
 !MaildirRepository methodsFor: 'file - querying' stamp: 'jpb 5/24/2021 12:55:16'!
 findCurrentFileByIdentifier: mailIdentifier
@@ -2184,23 +2314,6 @@ findAllCurrentMailIdentifiers
 	^foundIdentifiers asArray
 	! !
 
-!MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 17:50:21'!
-findAllCurrentMailIdentifiersByQuery: query
-	"Returns a list of all the mail identifiers in the cur/ directory of the repository"
-	| foundIdentifiers |
-	
-	foundIdentifiers _ OrderedCollection new.
-	
-	repositoryDirectory ifNil: [ ^#() ].
-	
-	(repositoryDirectory / 'cur')
-		filesDo: [:fileEntry | 
-			(query value: fileEntry)
-				ifTrue: [ foundIdentifiers add: (self class findMailIdentifierByFilename: fileEntry name )]].
-	
-	^foundIdentifiers asArray
-	! !
-
 !MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 18:27:34'!
 findAllCurrentMailRecords
 	"Returns a list of all the mail records in the cur/ directory of the repository"
@@ -2217,23 +2330,6 @@ findAllCurrentMailRecords
 	^foundIdentifiers asArray
 	! !
 
-!MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 18:27:24'!
-findAllCurrentMailRecordsByQuery: query
-	"Returns a list of all the mail records in the cur/ directory of the repository"
-	| foundIdentifiers |
-	
-	foundIdentifiers _ OrderedCollection new.
-	
-	repositoryDirectory ifNil: [ ^#() ].
-	
-	(repositoryDirectory / 'cur')
-		filesDo: [:fileEntry | 
-			(query value: fileEntry)
-				ifTrue: [ foundIdentifiers add: (self buildMailRecordWith: fileEntry )]].
-	
-	^foundIdentifiers asArray
-	! !
-
 !MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/24/2021 11:07:30'!
 findAllMailIdentifiers
 	"Returns a list of all the mail identifiers in the repository"
@@ -2244,17 +2340,6 @@ findAllMailIdentifiers
 	foundIdentifiers _ self findAllNewMailIdentifiers.
 	
 	^foundIdentifiers , self findAllCurrentMailIdentifiers! !
-
-!MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 18:00:04'!
-findAllMailIdentifiersByQuery: query
-	"Returns a list of all the mail identifiers in the repository"
-	| foundIdentifiers |
-	
-	repositoryDirectory ifNil: [ ^#() ].
-	
-	foundIdentifiers _ self findAllNewMailIdentifiersByQuery: query.
-	
-	^foundIdentifiers , (self findAllCurrentMailIdentifiersByQuery: query).! !
 
 !MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 21:52:21'!
 findAllMailRecords
@@ -2267,17 +2352,6 @@ findAllMailRecords
 	
 	^(foundIdentifiers , self findAllCurrentMailRecords) sorted! !
 
-!MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 18:25:03'!
-findAllMailRecordsByQuery: query
-	"Returns a list of all the mail identifiers in the repository"
-	| foundIdentifiers |
-	
-	repositoryDirectory ifNil: [ ^#() ].
-	
-	foundIdentifiers _ self findAllNewMailRecordsByQuery: query.
-	
-	^foundIdentifiers , (self findAllCurrentMailRecordsByQuery: query).! !
-
 !MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/24/2021 12:41:48'!
 findAllNewMailIdentifiers
 	"Returns a list of all the mail identifiers in new/ directory of the repository"
@@ -2289,23 +2363,6 @@ findAllNewMailIdentifiers
 	
 	(repositoryDirectory / 'new')
 		filesDo: [:fileEntry |  foundIdentifiers add: fileEntry name ].
-	
-	^foundIdentifiers asArray
-	! !
-
-!MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 17:50:02'!
-findAllNewMailIdentifiersByQuery: query
-	"Returns a list of all the mail identifiers in new/ directory of the repository"
-	| foundIdentifiers |
-	
-	foundIdentifiers _ OrderedCollection new.
-	
-	repositoryDirectory ifNil: [ ^#() ].
-	
-	(repositoryDirectory / 'new')
-		filesDo: [:fileEntry |  
-			(query value: fileEntry) 
-				ifTrue: [ foundIdentifiers add: fileEntry name ] ].
 	
 	^foundIdentifiers asArray
 	! !
@@ -2325,27 +2382,6 @@ findAllNewMailRecords
 			newRecord _ self buildMailRecordWith: fileEntry.
 			newRecord addFlag: #new.
 			foundIdentifiers add: newRecord ].
-	
-	^foundIdentifiers asArray
-	! !
-
-!MaildirRepository methodsFor: 'mail - querying' stamp: 'jpb 5/25/2021 21:09:42'!
-findAllNewMailRecordsByQuery: query
-	"Returns a list of all the mail records in new/ directory of the repository"
-	| foundIdentifiers |
-	
-	foundIdentifiers _ OrderedCollection new.
-	
-	repositoryDirectory ifNil: [ ^#() ].
-	
-	(repositoryDirectory / 'new')
-		filesDo: [:fileEntry |  
-			(query value: fileEntry) 
-				ifTrue: [
-					| newRecord |
-					newRecord _ self buildMailRecordWith: fileEntry.
-					newRecord addFlag: #new.
-					foundIdentifiers add: newRecord] ].
 	
 	^foundIdentifiers asArray
 	! !

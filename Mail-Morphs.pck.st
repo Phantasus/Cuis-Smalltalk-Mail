@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 26 May 2021 at 10:40:34 am'!
+'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 9:46:15 am'!
 'Description Author: Josef Philip Bernhart
 License: MIT
 
 Copyright 2021 Josef Philip Bernhart
 '!
-!provides: 'Mail-Morphs' 1 3!
+!provides: 'Mail-Morphs' 1 4!
 SystemOrganization addCategory: 'Mail-Morphs'!
 
 
@@ -22,30 +22,28 @@ MailBrowserWindow class
 !MailBrowserWindow commentStamp: '<historical>' prior: 0!
 Represents a window for editing and sending mail. It's intention is to test functionality, not to be a full mail client.!
 
-!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/25/2021 22:25:12'!
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:29:26'!
+buildForwardMailButton
+	| button |
+	button _ PluggableButtonMorph 
+		model: model
+		stateGetter: nil
+		action: #forwardSelectedMail.
+
+	button label: 'Forward'.
+	button setBalloonText: 'Starts a new forward to the selected mail'.
+	^button! !
+
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:26:48'!
 buildMailActionButtons
 	"Returns a layout morph which contains edit buttons"
-	| buttonsContainer button |
+	| buttonsContainer |
 	buttonsContainer _ LayoutMorph newRow.
 	
-	button _ PluggableButtonMorph 
-		model: model
-		stateGetter: nil
-		action: #newMail.
-
-	button label: 'New'.
-	button setBalloonText: 'Starts a new mail'.
-	buttonsContainer addMorph: button proportionalWidth: 10.			
-
-	button _ PluggableButtonMorph 
-		model: model
-		stateGetter: nil
-		action: #sendMail.
-
-	button label: 'Send'.
-	button setBalloonText: 'Sends the currently edited mail'.
-		
-	buttonsContainer addMorph: button proportionalWidth: 10.
+	buttonsContainer addMorph: self buildNewMailButton proportionalWidth: 10.			
+	buttonsContainer addMorph: self buildSendMailButton proportionalWidth: 10.
+	buttonsContainer addMorph: self buildReplyMailButton proportionalWidth: 10.
+	buttonsContainer addMorph: self buildForwardMailButton proportionalWidth: 10.
 		
 	^buttonsContainer! !
 
@@ -73,7 +71,7 @@ buildMailViewPane
 	
 	^newView! !
 
-!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/25/2021 21:42:23'!
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/26/2021 20:48:02'!
 buildMorphicWindow
 	"Create a pluggable version of all the morphs for a Browser in Morphic"
 	| mailListPane mailViewPane newMailViewPane |
@@ -85,7 +83,19 @@ buildMorphicWindow
 	self layoutMorph
 		addMorph: mailListPane proportionalHeight: 0.3;
 		addAdjusterAndMorph: mailViewPane proportionalHeight: 0.3;
-		addAdjusterAndMorph: newMailViewPane proportionalHeight: 0.4.! !
+		addAdjusterAndMorph: newMailViewPane layoutSpec: LayoutSpec useAll.! !
+
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:16:16'!
+buildNewMailButton
+	| button |
+	button _ PluggableButtonMorph 
+		model: model
+		stateGetter: nil
+		action: #newMail.
+
+	button label: 'New'.
+	button setBalloonText: 'Starts a new mail'.
+	^button! !
 
 !MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/26/2021 09:40:42'!
 buildNewMailViewPane
@@ -103,3 +113,27 @@ buildNewMailViewPane
 	paneContainer addMorph: newView proportionalHeight: 0.8.
 	
 	^paneContainer! !
+
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:28:22'!
+buildReplyMailButton
+	| button |
+	button _ PluggableButtonMorph 
+		model: model
+		stateGetter: nil
+		action: #replyToSelectedMail.
+
+	button label: 'Reply'.
+	button setBalloonText: 'Starts a new reply to the selected mail'.
+	^button! !
+
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:17:05'!
+buildSendMailButton
+	| button |
+	button _ PluggableButtonMorph 
+		model: model
+		stateGetter: nil
+		action: #sendMail.
+
+	button label: 'Send'.
+	button setBalloonText: 'Sends the currently edited mail'.
+	^button! !
