@@ -73,3 +73,141 @@ The first commit of this work was:
 >       MIME, Gemini, HTTP and other protocols which need to
 >       read and interpret these specially formatted type tags.
 
+# Adding SMTP and POP3 clients from Squeak 5.2 (28. May 2021)
+
+On the 28. May 2021 Josef Philip Bernhart (jpb) added the
+`SMTPClient`, `SMTPClientTest`, `POP3Client` from the 
+`Squeak 5.2-18225` image. This means that the license of these
+packages is MIT license as Squeak is under MIT License. 
+
+They were moved into the `References` directory for providing
+further references to the actual implementation in cuis. The
+`sha256sum` of these files at the time of writing are:
+
+> b02cc0af8066f8b9cb9a4e6ab05c10c2592fc747dc86564606611f34a14ae905  References/SMTPClient.st
+> 5f227e3d337754eecb044876d1490a3fd39b8cb892b38292cce0f0e8fa721aca  References/SMTPClientTest.st
+> 49190170a1eb7eaae17d958eb2c9126212a25ecf42097c8f0052dfd694932ec4  References/POP3Client.st
+
+The authors of these files were extracted after the line endings were converted to linefeed
+with the command:
+
+> cat <file> | tr '\r' '\n' > <new_file>.st
+
+and the command for extracting the authors was always:
+
+> grep 'methodsFor:.*stamp:' <new_file>.st | sed "s/^.*stamp: '([^ ]*) [^']+'.*$/\1/g" -E | sort | uniq
+
+The authors for `POP3Client` are:
+
+- Luciano Esteban Notarfrancesco (len)
+- Michael Rueger (mir)
+- Nicolas Cellier (nice)
+- Patrick Rein (pre)
+- Brian Brown (rbb)
+
+The authors `SMTPClient.st` are
+
+- Andreas Raab (ar)
+- Frank Shearar (Fbs)
+- gk
+- klub
+- Michael Rueger (mir)
+- Patrick Rein (pre)
+
+The authors `SMTPClientTest.st` are:
+
+- Frank Shearar (fbs)
+
+
+# Adding the IMAPClient project from hpi-swa (28. May 2021)
+
+In addition the `IMAPClient-Core` and `IMAPClient-Protocol` packages
+were filed out from the image after installing the `IMAPClient` through
+issuing:
+
+> Metacello new
+>   baseline: 'IMAPClient';
+>  repository: 'github://hpi-swa-teaching/IMAPClient:develop/packages';
+>  load.
+
+The license of this project is the MIT License, as clearly visible on the
+screenshot of the github page located at https://github.com/hpi-swa-teaching/IMAPClient
+in `References/screeshot_github_imapclient_license_20210528.png`.
+
+At the time of writing the latest commit in that repository was:
+
+> commit 5437c6e6c9194ec38035562a12a9ae8d4b075764 (HEAD -> develop, origin/develop, origin/HEAD)
+> Merge: aa44480 351e493
+> Author: Lorenz Woth <Zumarta@users.noreply.github.com>
+> Date:   Fri Aug 7 17:29:56 2020 +0200
+>
+>    Merge pull request #377 from hpi-swa-teaching/hotfix/ci
+>    
+>    Fix CI according to missing GitHubToken
+
+After issuing the above metacello install command in the `Squeak 5.2-18225`
+were installed the following package versions:
+
+For the `IMAPClient-Core`:
+
+> Name: IMAPClient-Core-cypress.1
+> Author: 
+> Time: 28 May 2021, 4:38:48.048082 pm
+> UUID: 1629ceb5-1f2c-4ceb-bcb9-a09cda83d25c
+> Ancestors: 
+
+> fabricated from a Cypress format repository
+
+For the `IMAPClient-Protocol`:
+
+> Name: IMAPClient-Protocol-cypress.1
+> Author: 
+> Time: 28 May 2021, 4:38:48.185993 pm
+> UUID: d3208dd3-bab3-4993-91ba-56e50232d1f7
+> Ancestors: 
+>
+> fabricated from a Cypress format repository
+
+There was also a `IMAPClient-UI` installed, but for the
+Cuis-Mail project the UI is not interesting as it would clash
+with the existing codebase.
+
+These files were filed out and placed into the `References` subdir,
+at the time of writing the `sha256sum` of these files were:
+
+> 31d5139a47d77e64ae4b5e5277ef3492e583b53dfdd608600cded8266342872d  References/IMAPClient-Core.st
+> 80040e06ad7592eddfaf2e0a3b35bf0eee006759a5200267fa531daf7054924e  References/IMAPClient-Protocol.st
+
+The authors of `IMAPClient-core.st` were extracted this way:
+
+> cat References/IMAPClient-Core.st | tr '\r' '\n' > IMAPClient-Core.st
+> grep 'methodsFor:.*stamp:' IMAPClient-Core.st | sed "s/^.*stamp: '([^ ]*) [^']+'.*$/\1/g" -E | sort | uniq
+
+The authors of `IMAPClient-Core.st` are:
+
+- AR
+- C.G.
+- DH
+- fr
+- Henrik Gedenryd (hg)
+- Jamie Jones (JJ)
+- Jerry Stokes (js)
+- lvm
+- LW
+- ms
+- Martin Wirblat (mw)
+- NH
+- ok
+- pm
+- tg
+
+The authors of `IMAPClient-Protocol.st` are:
+
+- Henrik Gedenryd (hg)
+- Jamie Jones (JJ)
+- LW
+- Marcel Taeumel (mt)
+- NH
+- ok
+- pm
+- tg
