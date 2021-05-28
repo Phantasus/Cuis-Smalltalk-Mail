@@ -211,3 +211,37 @@ The authors of `IMAPClient-Protocol.st` are:
 - ok
 - pm
 - tg
+
+# Adds TelnetProtocolClient and ProtocolClient from Squeak 5.2 (28. May 2021)
+
+Adds from `Squeak5.2-18225` the `ProtocolClient` and `TelnetProtocolClient` classes
+for reference, as these are the base classes for the before included pop3 and smtp client
+classes. These classes were filed out and put into the `References` directory for later
+reference purposes of building the implementation of the client together.
+
+The `sha256sum` of these files are:
+
+> 6727cd5fa9af2a81826c5df94db3cb0ec5b03e3b46325ad3ee3a1ec7702e12cb  References/ProtocolClient.st
+> 0df46ccf7cdc9cb44c863820b51530d6f08f85b41434eae087e4cfcb57533864  References/TelnetProtocolClient.st
+
+The authors of `ProtocolClient` were extracted by:
+
+> cat References/ProtocolClient.st | tr '\r' '\n' > ProtocolClient.st
+> grep 'methodsFor:.*stamp:' ProtocolClient.st | sed "s/^.*stamp: '([^ ]*) [^']+'.*$/\1/g" -E | sort | uniq
+
+The authors of `ProtocolClient` are:
+
+- gk
+- Keith Hodges (kph)
+- Michael Rueger (mir)
+- Patrick Rein (pre)
+
+The authors of `TelnetProtocolClient` were extracted by these commands:
+
+> cat References/TelnetProtocolClient.st | tr '\r' '\n' > TelnetProtocolClient.st
+> grep 'methodsFor:.*stamp:' TelnetProtocolClient.st  | sed "s/^.*stamp: '([^ ]*) [^']+'.*$/\1/g" -E | sort | uniq
+
+The authors of `TelnetProtocolClient` are:
+
+- Michael Rueger (mir)
+- Patrick Rein (pre)
