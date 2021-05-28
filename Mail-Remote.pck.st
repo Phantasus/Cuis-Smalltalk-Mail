@@ -1,20 +1,63 @@
-'From Cuis 5.0 [latest update: #4579] on 28 May 2021 at 6:26:06 pm'!
+'From Cuis 5.0 [latest update: #4579] on 28 May 2021 at 10:22:42 pm'!
 'Description Clients for POP3, SMTP and IMAP protocols
 
 Author: Others (see AUTHORs.md) and Josef Philip Bernhart (jpb)
 License: MIT'!
-!provides: 'Mail-Remote' 1 1!
+!provides: 'Mail-Remote' 1 7!
+!requires: 'Network-Kernel' 1 5 nil!
+!requires: 'WebClient' 1 20 nil!
+!requires: 'Mail-Kernel' 1 61 nil!
 SystemOrganization addCategory: 'Mail-Remote'!
 
 
-!classDefinition: #ICAddressBook category: 'Mail-Remote'!
-OrderedCollection subclass: #ICAddressBook
+!classDefinition: #ImapAddressBook category: 'Mail-Remote'!
+OrderedCollection subclass: #ImapAddressBook
 	instanceVariableNames: ''
 	classVariableNames: 'Instance'
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICAddressBook class' category: 'Mail-Remote'!
-ICAddressBook class
+!classDefinition: 'ImapAddressBook class' category: 'Mail-Remote'!
+ImapAddressBook class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailProtocolError category: 'Mail-Remote'!
+Error subclass: #MailProtocolError
+	instanceVariableNames: 'protocolInstance'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Remote'!
+!classDefinition: 'MailProtocolError class' category: 'Mail-Remote'!
+MailProtocolError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailClientError category: 'Mail-Remote'!
+MailProtocolError subclass: #MailClientError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Remote'!
+!classDefinition: 'MailClientError class' category: 'Mail-Remote'!
+MailClientError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailLoginFailedError category: 'Mail-Remote'!
+MailProtocolError subclass: #MailLoginFailedError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Remote'!
+!classDefinition: 'MailLoginFailedError class' category: 'Mail-Remote'!
+MailLoginFailedError class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailPop3LoginError category: 'Mail-Remote'!
+MailProtocolError subclass: #MailPop3LoginError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Remote'!
+!classDefinition: 'MailPop3LoginError class' category: 'Mail-Remote'!
+MailPop3LoginError class
 	instanceVariableNames: ''!
 
 !classDefinition: #SMTPClientTest category: 'Mail-Remote'!
@@ -27,135 +70,145 @@ TestCase subclass: #SMTPClientTest
 SMTPClientTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICNullStream category: 'Mail-Remote'!
-SocketStream subclass: #ICNullStream
+!classDefinition: #ImapNullStream category: 'Mail-Remote'!
+SocketStream subclass: #ImapNullStream
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICNullStream class' category: 'Mail-Remote'!
-ICNullStream class
+!classDefinition: 'ImapNullStream class' category: 'Mail-Remote'!
+ImapNullStream class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICAccountInfo category: 'Mail-Remote'!
-Object subclass: #ICAccountInfo
+!classDefinition: #ImapAccountInfo category: 'Mail-Remote'!
+Object subclass: #ImapAccountInfo
 	instanceVariableNames: 'accountName host port username password ssl'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICAccountInfo class' category: 'Mail-Remote'!
-ICAccountInfo class
+!classDefinition: 'ImapAccountInfo class' category: 'Mail-Remote'!
+ImapAccountInfo class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICCommand category: 'Mail-Remote'!
-Object subclass: #ICCommand
+!classDefinition: #ImapCommand category: 'Mail-Remote'!
+Object subclass: #ImapCommand
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICCommand class' category: 'Mail-Remote'!
-ICCommand class
+!classDefinition: 'ImapCommand class' category: 'Mail-Remote'!
+ImapCommand class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICEmail category: 'Mail-Remote'!
-Object subclass: #ICEmail
-	instanceVariableNames: 'body header folder messageID uniqueID'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Mail-Remote'!
-!classDefinition: 'ICEmail class' category: 'Mail-Remote'!
-ICEmail class
-	instanceVariableNames: ''!
-
-!classDefinition: #ICEndPoint category: 'Mail-Remote'!
-Object subclass: #ICEndPoint
+!classDefinition: #ImapEndPoint category: 'Mail-Remote'!
+Object subclass: #ImapEndPoint
 	instanceVariableNames: 'stream accountInfo loggedIn rootFolder lastResponse uids hierarchyDelimiter currentFolderName fatalErrorOccured folderNameOfTrash readWriter'
 	classVariableNames: 'ConnectionConfigurations'
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICEndPoint class' category: 'Mail-Remote'!
-ICEndPoint class
+!classDefinition: 'ImapEndPoint class' category: 'Mail-Remote'!
+ImapEndPoint class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICFileReadWriter category: 'Mail-Remote'!
-Object subclass: #ICFileReadWriter
+!classDefinition: #ImapFileReadWriter category: 'Mail-Remote'!
+Object subclass: #ImapFileReadWriter
 	instanceVariableNames: 'directoryToFolderDictionary endpoint'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICFileReadWriter class' category: 'Mail-Remote'!
-ICFileReadWriter class
+!classDefinition: 'ImapFileReadWriter class' category: 'Mail-Remote'!
+ImapFileReadWriter class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICFolder category: 'Mail-Remote'!
-Object subclass: #ICFolder
+!classDefinition: #ImapFolder category: 'Mail-Remote'!
+Object subclass: #ImapFolder
 	instanceVariableNames: 'parent childFolders folderName emails endpoint'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICFolder class' category: 'Mail-Remote'!
-ICFolder class
+!classDefinition: 'ImapFolder class' category: 'Mail-Remote'!
+ImapFolder class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICParser category: 'Mail-Remote'!
-Object subclass: #ICParser
+!classDefinition: #ImapMailRecord category: 'Mail-Remote'!
+Object subclass: #ImapMailRecord
+	instanceVariableNames: 'body header folder messageID uniqueID'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Remote'!
+!classDefinition: 'ImapMailRecord class' category: 'Mail-Remote'!
+ImapMailRecord class
+	instanceVariableNames: ''!
+
+!classDefinition: #ImapParser category: 'Mail-Remote'!
+Object subclass: #ImapParser
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICParser class' category: 'Mail-Remote'!
-ICParser class
+!classDefinition: 'ImapParser class' category: 'Mail-Remote'!
+ImapParser class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICProtocolFolder category: 'Mail-Remote'!
-Object subclass: #ICProtocolFolder
+!classDefinition: #ImapProtocolFolder category: 'Mail-Remote'!
+Object subclass: #ImapProtocolFolder
 	instanceVariableNames: 'hierarchyDelimiter folderPath'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICProtocolFolder class' category: 'Mail-Remote'!
-ICProtocolFolder class
+!classDefinition: 'ImapProtocolFolder class' category: 'Mail-Remote'!
+ImapProtocolFolder class
 	instanceVariableNames: ''!
 
-!classDefinition: #ICStreamWrapper category: 'Mail-Remote'!
-Object subclass: #ICStreamWrapper
+!classDefinition: #ImapStreamer category: 'Mail-Remote'!
+Object subclass: #ImapStreamer
 	instanceVariableNames: 'host port stream lastResponse ssl'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'ICStreamWrapper class' category: 'Mail-Remote'!
-ICStreamWrapper class
+!classDefinition: 'ImapStreamer class' category: 'Mail-Remote'!
+ImapStreamer class
 	instanceVariableNames: ''!
 
-!classDefinition: #POP3Client category: 'Mail-Remote'!
-Object subclass: #POP3Client
+!classDefinition: #MailProtocolClient category: 'Mail-Remote'!
+Object subclass: #MailProtocolClient
+	instanceVariableNames: 'stream connectInfo serverCapabilities lastResponse pendingResponses progressObservers'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Remote'!
+!classDefinition: 'MailProtocolClient class' category: 'Mail-Remote'!
+MailProtocolClient class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailPop3Client category: 'Mail-Remote'!
+MailProtocolClient subclass: #MailPop3Client
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'POP3Client class' category: 'Mail-Remote'!
-POP3Client class
+!classDefinition: 'MailPop3Client class' category: 'Mail-Remote'!
+MailPop3Client class
 	instanceVariableNames: ''!
 
-!classDefinition: #SMTPClient category: 'Mail-Remote'!
-ProtoObject subclass: #SMTPClient
-	instanceVariableNames: ''
-	classVariableNames: 'UseTLSIfAvailable'
+!classDefinition: #MailSmtpClient category: 'Mail-Remote'!
+MailProtocolClient subclass: #MailSmtpClient
+	instanceVariableNames: 'responseCode'
+	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Remote'!
-!classDefinition: 'SMTPClient class' category: 'Mail-Remote'!
-SMTPClient class
+!classDefinition: 'MailSmtpClient class' category: 'Mail-Remote'!
+MailSmtpClient class
 	instanceVariableNames: ''!
 
 
-!ICAddressBook commentStamp: 'LW 8/1/2020 11:23' prior: 0!
+!ImapAddressBook commentStamp: 'LW 8/1/2020 11:23' prior: 0!
 An ICAddressBook is a collection for the user's contacts containing email addresses of all accounts.
 This is a singleton which can be accessed with #new.!
 
-!ICNullStream commentStamp: 'tg 7/25/2019 12:25' prior: 0!
+!ImapNullStream commentStamp: 'tg 7/25/2019 12:25' prior: 0!
 An ICNullStream is a Null Object resembling an SocketStream. !
 
-!ICAccountInfo commentStamp: 'LW 8/1/2020 11:20' prior: 0!
+!ImapAccountInfo commentStamp: 'LW 8/1/2020 11:20' prior: 0!
 An ICAccountInfo is a dataobject holding information needed to connect to a server such as server address and user credentials. It also ensures basic IMAP datatype validity.
 
 Instance Variables
@@ -168,21 +221,11 @@ Instance Variables
 	
 	!
 
-!ICCommand commentStamp: 'pm 7/23/2019 15:11' prior: 0!
+!ImapCommand commentStamp: 'pm 7/23/2019 15:11' prior: 0!
 ICCommands builds commands to send to the server.
 The commands are conform to the IMAProtocol.!
 
-!ICEmail commentStamp: 'tg 7/19/2019 10:33' prior: 0!
-An ICEmail is an object resembling an email residing on a remote server. This is automatically created when calling ICFolder>>fetchHeaders.
-
-Instance Variables
-	body:		The body of the ICEmail. ICEmail>>retrieveBody needs to be called to fill the body.
-	folder:		The ICFolder this ICEmail resides in.
-	header:		The header of the ICEmail. This gets parsed into the instance variables date, from, to and subject.
-	date:		https://tools.ietf.org/html/rfc2822#page-14, date represents the local time and the zone is the timezone information.
-			!
-
-!ICEndPoint commentStamp: 'LW 8/2/2020 14:03' prior: 0!
+!ImapEndPoint commentStamp: 'LW 8/2/2020 14:03' prior: 0!
 An ICEndPoint is main class for our framework, handling server communication.
 
 Instance Variables
@@ -198,14 +241,14 @@ Instance Variables
       folderNameOfTrash: 	Folder name string of the trash folder on the server.
 	readWriter: 			Responsible for disk I/O. Instance of ICFileReadWriter.!
 
-!ICFileReadWriter commentStamp: 'LW 8/1/2020 11:14' prior: 0!
+!ImapFileReadWriter commentStamp: 'LW 8/1/2020 11:14' prior: 0!
 An ICFileReadWriter is a JSON File Writer and Reader handling the file system storage of mails.
 
 Instance Variables:
 	directoryToFolderDictionary: Dictionary that maps a folder instance to each directory.
 	endpoint: Endpoint instance.!
 
-!ICFolder commentStamp: 'jwe 7/28/2016 14:20' prior: 0!
+!ImapFolder commentStamp: 'jwe 7/28/2016 14:20' prior: 0!
 An ICFolder is an object resembling an IMAP folder on a remote server.
 
 
@@ -216,10 +259,20 @@ Instance Variables
 	name:		The name of the folder.
 	parent:		The parent ICFolder. This is automatically filled in by the ICEndPoint.			!
 
-!ICParser commentStamp: 'pm 7/12/2019 20:20' prior: 0!
+!ImapMailRecord commentStamp: 'tg 7/19/2019 10:33' prior: 0!
+An ICEmail is an object resembling an email residing on a remote server. This is automatically created when calling ICFolder>>fetchHeaders.
+
+Instance Variables
+	body:		The body of the ICEmail. ICEmail>>retrieveBody needs to be called to fill the body.
+	folder:		The ICFolder this ICEmail resides in.
+	header:		The header of the ICEmail. This gets parsed into the instance variables date, from, to and subject.
+	date:		https://tools.ietf.org/html/rfc2822#page-14, date represents the local time and the zone is the timezone information.
+			!
+
+!ImapParser commentStamp: 'pm 7/12/2019 20:20' prior: 0!
 An ICParser is a stateless method bin that can parse a header, email body and folder path from a response.!
 
-!ICProtocolFolder commentStamp: 'pm 7/12/2019 18:04' prior: 0!
+!ImapProtocolFolder commentStamp: 'pm 7/12/2019 18:04' prior: 0!
 An ICProtocolFolder is a wrapper for a folder and contains a folder path and a hierarchy delimiter
 
 Instance Variables
@@ -227,7 +280,7 @@ Instance Variables
 	hierarchyDelimiter:		String
 !
 
-!ICStreamWrapper commentStamp: 'ms 7/28/2016 11:51' prior: 0!
+!ImapStreamer commentStamp: 'ms 7/28/2016 11:51' prior: 0!
 An ICStreamWrapper capsules low-level stream interactions.
 
 Instance Variables
@@ -237,14 +290,24 @@ Instance Variables
 	ssl:		A boolean flag indicating whether SSL is enabled.
 	stream:		Contains the SocketStream (if SSL is disabled) or SecureSocketStream (if SSL is enabled) of our connection.!
 
-!POP3Client commentStamp: '<historical>' prior: 0!
+!MailProtocolClient commentStamp: '<historical>' prior: 0!
+ProtocolClient is the abstract super class for a variety of network protocol clients.
+It uses a stream rather than the direct network access so it could also work for streams on serial connections etc.
+
+Structure:
+	stream				stream representing the connection to and from the server
+	connectInfo			information required for opening a connection
+	lastResponse			remembers the last response from the server.
+	progressObservers 	any object understanding #show: can be registered as a progress observer (login, transfer, etc)!
+
+!MailPop3Client commentStamp: '<historical>' prior: 0!
 This class implements POP3 (Post Office Protocol 3) as specified in RFC 1939.  (see http://www.ietf.org/rfc.html)
 
 You can use it to download email from the mail server to your personal mail program.
 
 To see an example of it's use, see POPSocket class>>example.!
 
-!SMTPClient commentStamp: '<historical>' prior: 0!
+!MailSmtpClient commentStamp: '<historical>' prior: 0!
 This class implements the SMTP (mail sending) protocol specified in RFC 821.
 
 HELO <SP> <domain> <CRLF>
@@ -277,7 +340,7 @@ TURN <CRLF>
 
 !
 
-!ICAccountInfo methodsFor: 'printing' stamp: 'fr 7/26/2019 16:52'!
+!ImapAccountInfo methodsFor: 'printing' stamp: 'fr 7/26/2019 16:52'!
 printOn: aStream
 
 	aStream nextPut: ({
@@ -289,21 +352,21 @@ printOn: aStream
 		self ssl
 	} joinSeparatedBy: ' ')! !
 
-!ICAddressBook methodsFor: 'action' stamp: 'LW 6/16/2020 09:51'!
+!ImapAddressBook methodsFor: 'action' stamp: 'LW 6/16/2020 09:51'!
 addEmail: aString
 
 	self addIfNotPresent: aString
 	
 ! !
 
-!ICAddressBook methodsFor: 'action' stamp: 'LW 6/16/2020 09:51'!
+!ImapAddressBook methodsFor: 'action' stamp: 'LW 6/16/2020 09:51'!
 find: anEntry
 
 	| index |
-	index := self indexOf: anEntry.
+	index _ self indexOf: anEntry.
 	^ self at: index! !
 
-!ICAddressBook methodsFor: 'initialize' stamp: 'LW 6/16/2020 09:51'!
+!ImapAddressBook methodsFor: 'initialize' stamp: 'LW 6/16/2020 09:51'!
 feedMeWithEntries: anEmailCollection
 
 	anEmailCollection do: [:emailAccount | 
@@ -311,28 +374,32 @@ feedMeWithEntries: anEmailCollection
 			readRootFoldersMailsFrom: emailAccount;
 			readChildFoldersMailsFrom: emailAccount.]! !
 
-!ICAddressBook methodsFor: 'initialize' stamp: 'LW 6/16/2020 09:50'!
+!ImapAddressBook methodsFor: 'initialize' stamp: 'LW 6/16/2020 09:50'!
 readChildFoldersMailsFrom: anEmailAccount
 
 	anEmailAccount rootFolder recursiveChildFolders do: [:childFolder |
 			childFolder emails do: [:childFolderEmail | 
 				self addEmail: childFolderEmail senderAddressFromHeader]]! !
 
-!ICAddressBook methodsFor: 'initialize' stamp: 'LW 6/10/2020 13:32'!
+!ImapAddressBook methodsFor: 'initialize' stamp: 'LW 6/10/2020 13:32'!
 readRootFoldersMailsFrom: anEmailAccount
 
 	anEmailAccount rootFolder emails do: [:rootFolderEmail | 
 			self addEmail: rootFolderEmail senderAddressFromHeader]! !
 
-!ICAddressBook class methodsFor: 'instance creation' stamp: 'hg 6/24/2020 12:34'!
+!ImapAddressBook class methodsFor: 'instance creation' stamp: 'hg 6/24/2020 12:34'!
 new
-	Instance ifNil: [Instance := super new: 10].
+	Instance ifNil: [Instance _ super new: 10].
 	^ Instance! !
 
-!SMTPClientTest methodsFor: 'running' stamp: 'fbs 3/22/2004 13:11'!
+!MailProtocolError methodsFor: 'as yet unclassified' stamp: 'jpb 5/28/2021 20:13:03'!
+protocolInstance: newInstance
+	protocolInstance _ newInstance ! !
+
+!SMTPClientTest methodsFor: 'running' stamp: 'jpb 5/28/2021 19:46:12'!
 setUp
-	socket := MockSocketStream on: ''.
-	smtp := SMTPClient new.
+	socket _ nil.
+	smtp _ nil.
 	smtp stream: socket.! !
 
 !SMTPClientTest methodsFor: 'testing' stamp: 'fbs 3/23/2004 17:15'!
@@ -348,137 +415,137 @@ testMailFrom
 	smtp mailFrom: 'Frank <frank@angband.za.org>'.
 	self assert: socket outStream contents = ('MAIL FROM: <frank@angband.za.org>', String crlf).! !
 
-!ICNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:02'!
+!ImapNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:02'!
 close
 
 	^ true! !
 
-!ICNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:04'!
+!ImapNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:04'!
 isConnected
 
 	^ false! !
 
-!ICNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:02'!
+!ImapNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:02'!
 nextLine
 
 	^ String empty! !
 
-!ICNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:07'!
+!ImapNullStream methodsFor: 'connection' stamp: 'js 6/7/2016 10:07'!
 sendCommand: aString
 
 	^ false! !
 
-!ICAccountInfo methodsFor: 'comparing' stamp: 'NH 7/15/2020 10:31'!
+!ImapAccountInfo methodsFor: 'comparing' stamp: 'NH 7/15/2020 10:31'!
 = anotherAccountInfo
 	^ (self class = anotherAccountInfo class)
 		and: [self asDictionary = anotherAccountInfo asDictionary]! !
 
-!ICAccountInfo methodsFor: 'comparing' stamp: 'LW 8/1/2020 12:04'!
+!ImapAccountInfo methodsFor: 'comparing' stamp: 'LW 8/1/2020 12:04'!
 hash
 	"Answer an integer value that is related to the identity of the receiver."
 
 	^ self username bitXor: (self accountName bitXor: (self host bitXor: self port hash))! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:20'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:20'!
 accountName
 
-	^ accountName ifNil: [accountName := self class initialAccountName]! !
+	^ accountName ifNil: [accountName _ self class initialAccountName]! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:35'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:35'!
 accountName: aString
 
-	accountName := aString! !
+	accountName _ aString! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:06'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:06'!
 host
 
-	^ host ifNil: [host := self class invalidHost]! !
+	^ host ifNil: [host _ self class invalidHost]! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:11'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:11'!
 host: aString
 
-	host := aString! !
+	host _ aString! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'JJ 6/12/2020 11:43'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'JJ 6/12/2020 11:43'!
 missingFields
 	
 	^ (self asDictionary select: [ :value | (value asString isEmpty) | (value = nil asString) ]) keys! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/15/2019 12:11'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/15/2019 12:11'!
 password
 	
-	^ password ifNil: [password := self class invalidPassword]! !
+	^ password ifNil: [password _ self class invalidPassword]! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:18'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:18'!
 password: aString
 	
 	(self canConvert: aString) ifFalse: [self error: (aString, ' is not IMAP convertable')].
-	password := aString! !
+	password _ aString! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:09'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:09'!
 port
 
-	^ port ifNil: [port := self class invalidPort]! !
+	^ port ifNil: [port _ self class invalidPort]! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:11'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:11'!
 port: aNumber
 
-	port := aNumber! !
+	port _ aNumber! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:21'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 20:21'!
 ssl
 
-	^ ssl ifNil: [ssl := self class initialSsl]! !
+	^ ssl ifNil: [ssl _ self class initialSsl]! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:34'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:34'!
 ssl: aBool
 
-	ssl := aBool! !
+	ssl _ aBool! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'fr 7/26/2019 15:37'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'fr 7/26/2019 15:37'!
 username
 
-	^ username ifNil: [username := self class invalidUsername]! !
+	^ username ifNil: [username _ self class invalidUsername]! !
 
-!ICAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:18'!
+!ImapAccountInfo methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:18'!
 username: aString
 
 	(self canConvert: aString) ifFalse: [self error: (aString, ' is not IMAP convertable')].
-	username := aString! !
+	username _ aString! !
 
-!ICAccountInfo methodsFor: 'validating' stamp: 'NH 7/15/2020 09:58'!
+!ImapAccountInfo methodsFor: 'validating' stamp: 'jpb 5/28/2021 19:17:28'!
 accountNameUnused
 
-	^ ICEndPoint connectionConfigurations
+	^ ImapEndPoint connectionConfigurations
 			noneSatisfy: [:each | (self accountName) = (each accountName)]! !
 
-!ICAccountInfo methodsFor: 'validating' stamp: 'fr 7/26/2019 15:37'!
+!ImapAccountInfo methodsFor: 'validating' stamp: 'fr 7/26/2019 15:37'!
 canConvert: aString
 	
 	^ ('"|\\' asRegex matchesIn: aString) isEmpty! !
 
-!ICAccountInfo methodsFor: 'validating' stamp: 'tg 7/15/2019 12:08'!
+!ImapAccountInfo methodsFor: 'validating' stamp: 'tg 7/15/2019 12:08'!
 hasValidServerInfo
 
 	^ self host ~= self class invalidHost
 		and: [self port ~= self class invalidPort]! !
 
-!ICAccountInfo methodsFor: 'validating' stamp: 'tg 7/15/2019 12:08'!
+!ImapAccountInfo methodsFor: 'validating' stamp: 'tg 7/15/2019 12:08'!
 hasValidUserInfo
 
 	^ self username ~= self class invalidUsername
 		and: [self password ~= self class invalidPassword]! !
 
-!ICAccountInfo methodsFor: 'validating' stamp: 'fr 7/26/2019 15:57'!
+!ImapAccountInfo methodsFor: 'validating' stamp: 'fr 7/26/2019 15:57'!
 isValid
 
 	^ self hasValidServerInfo and: [self hasValidUserInfo]! !
 
-!ICAccountInfo methodsFor: 'converting' stamp: 'tg 7/18/2019 23:07'!
+!ImapAccountInfo methodsFor: 'converting' stamp: 'tg 7/18/2019 23:07'!
 asDictionary
 	
 	| dict |
-	dict := Dictionary new.
+	dict _ Dictionary new.
 	dict at: 'ssl' put: self ssl;
 		at: 'accountName' put: self accountName;
 		at: 'address' put: self host;
@@ -489,52 +556,52 @@ asDictionary
 	^ dict
 	! !
 
-!ICAccountInfo methodsFor: 'converting' stamp: 'tg 7/10/2019 17:18'!
+!ImapAccountInfo methodsFor: 'converting' stamp: 'tg 7/10/2019 17:18'!
 passwordAsIMAPString
 	
 	^ '"', self password, '"'! !
 
-!ICAccountInfo methodsFor: 'converting' stamp: 'tg 7/10/2019 17:18'!
+!ImapAccountInfo methodsFor: 'converting' stamp: 'tg 7/10/2019 17:18'!
 usernameAsIMAPString
 
 	^ '"', self username, '"'! !
 
-!ICAccountInfo methodsFor: 'action' stamp: 'LW 7/31/2020 11:39'!
+!ImapAccountInfo methodsFor: 'action' stamp: 'LW 7/31/2020 11:39'!
 eraseStoredPassword
 	
 	self password: ''! !
 
-!ICAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 17:43'!
+!ImapAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 17:43'!
 initialAccountName
 
 	^ String empty! !
 
-!ICAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 17:43'!
+!ImapAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 17:43'!
 initialSsl
 
 	^ true! !
 
-!ICAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:08'!
+!ImapAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:08'!
 invalidHost
 
 	^ String empty! !
 
-!ICAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:10'!
+!ImapAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:10'!
 invalidPassword
 
 	^ String empty! !
 
-!ICAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:09'!
+!ImapAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:09'!
 invalidPort
 
 	^ -1! !
 
-!ICAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:10'!
+!ImapAccountInfo class methodsFor: 'constants' stamp: 'tg 7/10/2019 20:10'!
 invalidUsername
 
 	^ String empty! !
 
-!ICAccountInfo class methodsFor: 'instance creation' stamp: 'NH 7/15/2020 10:14'!
+!ImapAccountInfo class methodsFor: 'instance creation' stamp: 'NH 7/15/2020 10:14'!
 newWith: aDataDictionary
 	
 	^ self new
@@ -545,32 +612,32 @@ newWith: aDataDictionary
 		password: (aDataDictionary at: 'password' ifAbsent: [self invalidPassword]);
 		ssl: (aDataDictionary at: 'ssl' ifAbsent: [self initialSsl])! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:18'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:18'!
 allUIDs
 
 	^ self join: {'UID SEARCH ALL'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:46'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:46'!
 deleteEmail: aMessageId
 
 	^ self join: {'STORE' . aMessageId . '+FLAGS \Deleted'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'NH 8/2/2020 11:35'!
+!ImapCommand class methodsFor: 'commands' stamp: 'NH 8/2/2020 11:35'!
 expungeEmails
 
 	^ self join: {'EXPUNGE'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:48'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:48'!
 fetchBody: aMessageId
 
 	^ self join: {'FETCH' . aMessageId . 'body[TEXT]'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/24/2019 21:18'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/24/2019 21:18'!
 fetchFlagsForUIDsFrom: aBeginUID to: anEndUID
 
 	^ self join: {'UID FETCH' . (aBeginUID asString, ':', anEndUID asString) . '(FLAGS)'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/24/2019 21:18'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/24/2019 21:18'!
 fetchHeadersForUIDsFrom: aBeginId to: anEndId
 
 	^ self join: {
@@ -578,471 +645,210 @@ fetchHeadersForUIDsFrom: aBeginId to: anEndId
 		(aBeginId asString, ':', anEndId asString) .
 		'(FLAGS BODY.PEEK[HEADER.FIELDS (from to subject date content-type content-transfer-encoding)])'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:50'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:50'!
 listSubfoldersOf: aFolder filterBy: aFilter
 
 	^ self join: {'LIST' . self putInQuotes: aFolder . self putInQuotes: aFilter}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:52'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:52'!
 loginWith: anAccountInfo
 
 	^ self join: {'LOGIN' . anAccountInfo usernameAsIMAPString . anAccountInfo passwordAsIMAPString}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:53'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:53'!
 logout
 
 	^ self join: {'LOGOUT'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:54'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 14:54'!
 moveEmail: aMessageId to: aFolder
 
 	^ self join: {'MOVE' . aMessageId . self putInQuotes: aFolder}
 ! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 15:09'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 15:09'!
 noop
 
 	^ self join: {'NOOP'}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 18:29'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 18:29'!
 resetFlag: aFlagString for: aMessageId
 
 	(self isValidFlag: aFlagString) ifFalse: [self error: 'Trying to send invalid Flag'].
 	^ self join: {'STORE' . aMessageId . '-FLAGS \', aFlagString withFirstCharacterUppercase}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 18:24'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 18:24'!
 select: aFolder
 
 	^ self join: {'SELECT' . self putInQuotes: aFolder}! !
 
-!ICCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 18:29'!
+!ImapCommand class methodsFor: 'commands' stamp: 'pm 7/23/2019 18:29'!
 setFlag: aFlagString for: aMessageId
 
 	(self isValidFlag: aFlagString) ifFalse: [self error: 'Trying to send invalid Flag'].
 	^ self join: {'STORE' . aMessageId . '+FLAGS \', aFlagString withFirstCharacterUppercase}! !
 
-!ICCommand class methodsFor: 'validation' stamp: 'JJ 7/31/2020 13:55'!
+!ImapCommand class methodsFor: 'validation' stamp: 'JJ 7/31/2020 13:55'!
 isValidFlag: aFlagString
 
 	^ {'Seen' . 'Flagged' . 'Deleted'} includes: aFlagString withFirstCharacterUppercase! !
 
-!ICCommand class methodsFor: 'command building' stamp: 'pm 7/24/2019 21:24'!
+!ImapCommand class methodsFor: 'command building' stamp: 'pm 7/24/2019 21:24'!
 join: aCommandArray
 
 	^ aCommandArray asOrderedCollection
 			addFirst: self protocolCommandStart;
 			joinSeparatedBy: self protocolBlank! !
 
-!ICCommand class methodsFor: 'command building' stamp: 'pm 7/25/2019 17:25'!
+!ImapCommand class methodsFor: 'command building' stamp: 'jpb 5/28/2021 19:18:13'!
 putInQuotes: aString
 
-	^ ICCommand protocolQuote, aString, ICCommand protocolQuote! !
+	^ ImapCommand protocolQuote, aString, ImapCommand protocolQuote! !
 
-!ICCommand class methodsFor: 'constants' stamp: 'pm 7/24/2019 21:21'!
+!ImapCommand class methodsFor: 'constants' stamp: 'pm 7/24/2019 21:21'!
 protocolBlank
 
 	^ ' '! !
 
-!ICCommand class methodsFor: 'constants' stamp: 'pm 7/24/2019 21:21'!
+!ImapCommand class methodsFor: 'constants' stamp: 'pm 7/24/2019 21:21'!
 protocolCommandStart
 
 	^ '.'! !
 
-!ICCommand class methodsFor: 'constants' stamp: 'pm 7/24/2019 21:21'!
+!ImapCommand class methodsFor: 'constants' stamp: 'pm 7/24/2019 21:21'!
 protocolQuote
 
 	^ '"'! !
 
-!ICEmail methodsFor: 'comparing' stamp: 'hg 7/30/2020 11:06'!
-= anObject
-	"Answer whether the receiver and anObject represent the same object."
-
-	self == anObject
-		ifTrue: [ ^ true ].
-	self class = anObject class
-		ifFalse: [ ^ false ].
-	^ self header = anObject header
-		and: [ 
-			self messageID = anObject messageID
-				and: [ self body = anObject body and: [ self folder = anObject folder and: [ self uniqueID = anObject uniqueID ] ] ] ]! !
-
-!ICEmail methodsFor: 'comparing' stamp: 'hg 7/30/2020 11:06'!
-hash
-	"Answer an integer value that is related to the identity of the receiver."
-
-	^ self header hash
-		bitXor: (self messageID hash bitXor: (self body hash bitXor: (self folder hash bitXor: self uniqueID hash)))! !
-
-!ICEmail methodsFor: 'converting' stamp: 'AR 7/28/2016 14:06'!
-asString
-
-	^ self headerAsString, String cr, String cr, self bodyAsString, String cr! !
-
-!ICEmail methodsFor: 'converting' stamp: 'AR 7/28/2016 13:58'!
-bodyAsString
-
-	^ self body asString
-
-	! !
-
-!ICEmail methodsFor: 'converting' stamp: 'C.G. 7/25/2018 13:47'!
-headerAsString
-
-	| headerFields |
-	
-	headerFields := self header keys sorted.
-	^ (headerFields collect: [:headerField |
-		headerField, ': ', (self header at: headerField)]) joinSeparatedBy: String cr! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/3/2019 21:27'!
-body
-
-	^ body ifNil: [body := String empty]! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:34'!
-body: aString
-
-	body := aString! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'tg 7/19/2019 11:31'!
-dateFormatted
-
-	| date formatted |
-		
-	date := DateAndTime fromSeconds: self dateInSecondsSinceSqueakEpoch + DateAndTime localOffset asSeconds.
-	
-	formatted := ((date dayOfMonth asString padded: #left to: 2 with: $0) ,'.', 
-			 (date month asString padded: #left to: 2 with: $0), '.',
-			 (date year asString padded: #left to: 2 with: $0),' ',
-			 (date hour24 asString padded: #left to: 2 with: $0),':',
-			 (date minute asString padded: #left to: 2 with: $0)).
-			
-	^ formatted! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'tg 7/26/2019 21:04'!
-dateInSecondsSince1980
-	
-	^ MailMessage new timeFrom: self date
-! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'tg 7/19/2019 10:35'!
-dateInSecondsSinceSqueakEpoch	
-	
-	^ self dateInSecondsSince1980 + (DateAndTime year: 1980 day: 1) asSeconds
-! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'ms 7/10/2016 13:31'!
-folder
-
-	^ folder! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/14/2019 14:44'!
-folder: anICFolder
-
-	folder := anICFolder! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/3/2019 21:28'!
-header
-
-	^ header ifNil: [header := Dictionary new]! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:37'!
-header: aDictionary
-
-	header := aDictionary! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'ms 7/10/2016 13:59'!
-messageID
-
-	^ messageID! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:41'!
-messageID: aNumber
-
-	messageID := aNumber! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'hg 7/29/2020 15:25'!
-serializeToJson
-
-	^ Json render: (
-		JsonObject newFrom: {
-			'header' -> (JsonObject newFrom: self header).
-			'body' -> self body.
-			'messageID' -> self messageID.
-			'uid' -> self uniqueID})! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/2/2019 15:58'!
-uniqueID
-
-	^ uniqueID ifNil: [uniqueID := 0]! !
-
-!ICEmail methodsFor: 'accessing' stamp: 'pm 6/2/2019 15:58'!
-uniqueID: aString
-
-	uniqueID := aString! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
-contentTransferEncoding
-
-	^ self header at: #contentTransferEncoding ifAbsent: String empty! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
-contentTransferEncoding: aContentTransferEncoding
-
-	self header at: #contentTransferEncoding put: aContentTransferEncoding! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
-contentType
-
-	^ self header at: #contentType ifAbsent: String empty! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
-contentType: aContentType
-
-	self header at: #contentType put: aContentType! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
-date
-
-	^ self header at: #date ifAbsent: String empty! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
-date: aDate
-
-	self header at: #date put: aDate! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'DH 7/19/2018 21:58'!
-deleted
-
-	^ self header at: #deleted ifAbsent: [false]! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'DH 7/19/2018 19:43'!
-deleted: aFlag
-
-	self header at: #deleted put: aFlag ! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'LW 8/1/2020 12:06'!
-deserializeFrom: aJson
-
-	self header: (Dictionary newFrom: (aJson at: 'header' ifAbsent: [JsonObject new]));
-		body: (aJson at: 'body');
-		messageID: (aJson at: 'messageID');
-		uniqueID: (aJson at: 'uid')! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
-flagged
-
-	^ self header at: #flagged ifAbsent: false! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
-flagged: aFlag
-
-	self header at: #flagged put: aFlag! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
-from
-
-	^ self header at: #from ifAbsent: String empty! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
-from: aSender
-
-	self header at: #from put: aSender! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
-seen
-
-	^ self header at: #seen ifAbsent: true! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
-seen: aFlag
-
-	self header at: #seen put: aFlag! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'hg 7/3/2020 16:10'!
-sender
-
-	| fromCollection |
-	fromCollection := self from findBetweenSubStrs: '<>'.
-	^ (fromCollection at: 2 ifAbsent: [fromCollection at: 1 ifAbsent: [ '' ]])! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'LW 8/2/2020 13:58'!
-senderAddressFromHeader
-
-	^ (MailAddressParser addressesIn: self from) first! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'tg 7/19/2019 11:45'!
-subject
-
-	^ self header at: #subject ifAbsent: String empty! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
-subject: aSubject
-
-	self header at: #subject put: aSubject! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'hg 7/30/2020 11:25'!
-to
-
-	^ self header at: #to ifAbsent: Array new! !
-
-!ICEmail methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
-to: aReceiver
-
-	self header at: #to put: aReceiver! !
-
-!ICEmail methodsFor: 'action' stamp: 'lvm 5/20/2018 20:10'!
-open
-
-	ICEmailDialog openWith: self! !
-
-!ICEmail methodsFor: 'action' stamp: 'JJ 8/2/2020 15:33'!
-retrieveBody
-	
-	"this is the only action that the email has to be responsible for, because it is called when an email is opened"
-	self folder endpoint retrieveBody: self.
-
-	^'Content-Type: ', (self contentType), Character cr,
-		'Content-Transfer-Encoding: ', self contentTransferEncoding,
-		Character cr, Character cr, self body! !
-
-!ICEmail class methodsFor: 'instance creation' stamp: 'hg 7/30/2020 09:50'!
-newFromJsonStream: aStream
-	
-	^ self basicNew
-		deserializeFrom: (Json readFrom: aStream);
-		initialize;
-		yourself! !
-
-!ICEndPoint methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:23'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'jpb 5/28/2021 19:18:27'!
 accountInfo
 
-	^ accountInfo ifNil: [accountInfo := ICAccountInfo new]! !
+	^ accountInfo ifNil: [accountInfo _ ImapAccountInfo new]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:24'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'tg 7/10/2019 17:24'!
 accountInfo: anICAccountInfo
 
-	accountInfo := anICAccountInfo! !
+	accountInfo _ anICAccountInfo! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 13:50'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 13:50'!
 currentFolderName
 
 	^ currentFolderName! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 13:50'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 13:50'!
 currentFolderName: aFolderName
 
-	currentFolderName := aFolderName! !
+	currentFolderName _ aFolderName! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 21:05'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 21:05'!
 fatalErrorOccured
 
-	^ fatalErrorOccured ifNil: [fatalErrorOccured := false]! !
+	^ fatalErrorOccured ifNil: [fatalErrorOccured _ false]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 21:05'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 21:05'!
 fatalErrorOccured: aBoolean
 	
-	fatalErrorOccured := aBoolean! !
+	fatalErrorOccured _ aBoolean! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 14:12'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 14:12'!
 folderNameOfTrash
 
 	^ folderNameOfTrash! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 14:13'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'tg 7/26/2019 14:13'!
 folderNameOfTrash: aNameString
 
-	folderNameOfTrash := aNameString! !
+	folderNameOfTrash _ aNameString! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'mw 5/11/2018 10:37'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'mw 5/11/2018 10:37'!
 hierarchyDelimiter
 
 	^ hierarchyDelimiter
 	! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'mw 5/11/2018 10:37'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'mw 5/11/2018 10:37'!
 hierarchyDelimiter: aSymbol
 
-	hierarchyDelimiter := aSymbol
+	hierarchyDelimiter _ aSymbol
 
 	! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:09'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:09'!
 host
 
 	^ self accountInfo host! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:10'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:10'!
 lastResponse
 
-	^ lastResponse ifNil: [lastResponse := OrderedCollection new]! !
+	^ lastResponse ifNil: [lastResponse _ OrderedCollection new]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'lvm 5/24/2018 10:16'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'lvm 5/24/2018 10:16'!
 lastResponse: anOrderedCollection
 
-	lastResponse := anOrderedCollection! !
+	lastResponse _ anOrderedCollection! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:07'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:07'!
 loggedIn
 
-	^ loggedIn ifNil: [loggedIn := false]! !
+	^ loggedIn ifNil: [loggedIn _ false]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'js 5/15/2016 13:09'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'js 5/15/2016 13:09'!
 loggedIn: aBool
 
-	loggedIn := aBool! !
+	loggedIn _ aBool! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'NH 7/30/2020 21:43'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'jpb 5/28/2021 19:17:12'!
 readWriter
-	^ readWriter ifNil: [readWriter := ICFileReadWriter newWith: self]! !
+	^ readWriter ifNil: [readWriter _ ImapFileReadWriter newWith: self]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'NH 7/30/2020 21:42'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'NH 7/30/2020 21:42'!
 readWriter: anObject
-	readWriter := anObject! !
+	readWriter _ anObject! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'hg 7/29/2020 10:50'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'hg 7/29/2020 10:50'!
 rootDirectoryName
 	
 	^ (SecureHashAlgorithm new 
 		hashMessage: self host, self username) 
 			asString first: self class accountFolderHashRelevantCharacters! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:09'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'jpb 5/28/2021 19:17:04'!
 rootFolder
 
-	^ rootFolder ifNil: [rootFolder := ICFolder newRootFolderWith: self]! !
+	^ rootFolder ifNil: [rootFolder _ ImapFolder newRootFolderWith: self]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'js 6/10/2016 15:09'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'js 6/10/2016 15:09'!
 rootFolder: anICFolder
 
-	rootFolder := anICFolder! !
+	rootFolder _ anICFolder! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:08'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'jpb 5/28/2021 22:22:32'!
 stream
 
-	^ stream ifNil: [stream := ICStreamWrapper new]! !
+	^ stream ifNil: [stream _ ImapStreamer new]! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'js 6/7/2016 10:17'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'js 6/7/2016 10:17'!
 stream: anICStreamWrapper
 
-	stream := anICStreamWrapper! !
+	stream _ anICStreamWrapper! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 13:59'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 13:59'!
 uids
 
 	^ uids! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:52'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:52'!
 uids: anOrderedCollection
 
-	uids := anOrderedCollection! !
+	uids _ anOrderedCollection! !
 
-!ICEndPoint methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:09'!
+!ImapEndPoint methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:09'!
 username
 
 	^ self accountInfo username! !
 
-!ICEndPoint methodsFor: 'error handling' stamp: 'tg 7/10/2019 19:29'!
+!ImapEndPoint methodsFor: 'error handling' stamp: 'tg 7/10/2019 19:29'!
 checkConnected
 	
 	(self fatalErrorOccured)
@@ -1055,32 +861,32 @@ checkConnected
   
 	^ true! !
 
-!ICEndPoint methodsFor: 'error handling' stamp: 'pm 7/25/2019 17:59'!
+!ImapEndPoint methodsFor: 'error handling' stamp: 'jpb 5/28/2021 19:16:43'!
 checkForBadRequest
 
 	(self fatalErrorOccured)
  		ifTrue: [^ false].
   
-	(ICParser responseIsError: self stream lastResponse) ifTrue: [
+	(ImapParser responseIsError: self stream lastResponse) ifTrue: [
 		self fatalErrorOccured: true.
 		^ Error signal: self class errorBadProtocol].
  
 	^ false! !
 
-!ICEndPoint methodsFor: 'error handling' stamp: 'tg 7/26/2019 11:43'!
+!ImapEndPoint methodsFor: 'error handling' stamp: 'jpb 5/28/2021 19:16:43'!
 checkForParameterError
 	
 	(self fatalErrorOccured)
 		ifTrue: [^ false].
   
-	(ICParser responseIsParameterError: self stream lastResponse) ifTrue: [
+	(ImapParser responseIsParameterError: self stream lastResponse) ifTrue: [
 		self fatalErrorOccured: true.
 		self inform: 'Wrong username or password'.
 		^ true].
   
 	^ false! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'tg 7/15/2019 12:44'!
+!ImapEndPoint methodsFor: 'login' stamp: 'tg 7/15/2019 12:44'!
 checkLoggedIn
   
 	(self fatalErrorOccured)
@@ -1094,7 +900,7 @@ checkLoggedIn
  
 ! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'LW 8/2/2020 16:30'!
+!ImapEndPoint methodsFor: 'login' stamp: 'LW 8/2/2020 16:30'!
 connectAndLoginWith: anICAccountInfo
 
 	self accountInfo: anICAccountInfo.
@@ -1105,7 +911,7 @@ connectAndLoginWith: anICAccountInfo
 	valueWithin: 5 seconds 
 	onTimeout: [self handleTimeout]! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'JJ 8/2/2020 16:43'!
+!ImapEndPoint methodsFor: 'login' stamp: 'jpb 5/28/2021 19:17:12'!
 login
 	
 	(self throwErrorIfNotLoggedIn) ifFalse: [^false].
@@ -1115,35 +921,35 @@ login
 	
 	(self throwErrorIfNotLoggedIn) ifFalse: [^false].
 	
-	(ICFileReadWriter newWith: self) readEmailsFromDisk.
+	(ImapFileReadWriter newWith: self) readEmailsFromDisk.
 	^ true! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'tg 7/25/2019 12:42'!
+!ImapEndPoint methodsFor: 'login' stamp: 'jpb 5/28/2021 19:18:13'!
 logout
 
 	self checkConnected.
-	self sendCommand: ICCommand logout.
+	self sendCommand: ImapCommand logout.
 	self
 		fetchNextResponse;
 		close.
 
 	^ true! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'JJ 8/2/2020 16:17'!
+!ImapEndPoint methodsFor: 'login' stamp: 'jpb 5/28/2021 19:18:13'!
 sendLoginCommand
 	
-	self sendCommand: (ICCommand loginWith: self accountInfo);
+	self sendCommand: (ImapCommand loginWith: self accountInfo);
 		fetchNextResponse;
-		loggedIn: (ICParser commandSucceeded: self stream lastResponse)! !
+		loggedIn: (ImapParser commandSucceeded: self stream lastResponse)! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'tg 7/26/2019 22:12'!
+!ImapEndPoint methodsFor: 'login' stamp: 'tg 7/26/2019 22:12'!
 testAccountWith: anAccountInfo
 
 	self connectAndLoginWith: anAccountInfo.
  
 	^ self fatalErrorOccured not! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'JJ 8/2/2020 16:42'!
+!ImapEndPoint methodsFor: 'login' stamp: 'JJ 8/2/2020 16:42'!
 throwErrorIfAccountInvalid
   	
 	(self accountInfo isValid) ifFalse: [
@@ -1151,7 +957,7 @@ throwErrorIfAccountInvalid
 		^ false].
 	^true! !
 
-!ICEndPoint methodsFor: 'login' stamp: 'JJ 8/2/2020 16:15'!
+!ImapEndPoint methodsFor: 'login' stamp: 'JJ 8/2/2020 16:15'!
 throwErrorIfNotLoggedIn
 	
 	(self checkConnected) ifFalse: [
@@ -1160,18 +966,18 @@ throwErrorIfNotLoggedIn
 		^ false].
 	^ true! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'AR 5/31/2016 11:12'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'AR 5/31/2016 11:12'!
 close
 
 	self stream close.
 	self loggedIn: false! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'tg 7/15/2019 13:27'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'tg 7/15/2019 13:27'!
 connect
 
 	self connectWith: self class defaultStreamClass! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'tg 7/18/2019 23:00'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'tg 7/18/2019 23:00'!
 connectWith: aStreamClass
 
 	self accountInfo isValid ifFalse: [^ Error signal: self class errorInvalidConnectionConfiguration].
@@ -1183,7 +989,7 @@ connectWith: aStreamClass
 	on: Error
 	do: [self fatalErrorOccured: true]! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'LW 8/2/2020 16:26'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'LW 8/2/2020 16:26'!
 handleTimeout
 		
 	(self fatalErrorOccured)
@@ -1191,35 +997,35 @@ handleTimeout
 			self inform: 'Connection could not be established due to a timeout'.
 			self fatalErrorOccured: true]! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'js 6/7/2016 10:13'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'js 6/7/2016 10:13'!
 isConnected
 
 	^ self stream isConnected! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'lvm 7/23/2018 23:33'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'lvm 7/23/2018 23:33'!
 preventTimeout
 
 	[self refreshConnectionProcess] forkAt: Processor userBackgroundPriority! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'ok 7/26/2019 21:04'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'jpb 5/28/2021 19:18:13'!
 refreshConnectionProcess
 
 	[self isConnected and: [self loggedIn]]
 		whileTrue: [
-			self sendCommand: ICCommand noop.
+			self sendCommand: ImapCommand noop.
 			self fetchNextResponse.
 			(Delay forSeconds: self class refreshConnectionIntervalInSeconds) wait]! !
 
-!ICEndPoint methodsFor: 'connection' stamp: 'DH 6/26/2018 20:21'!
+!ImapEndPoint methodsFor: 'connection' stamp: 'DH 6/26/2018 20:21'!
 sendCommand: aCommand
 	
 	self stream sendCommand: aCommand! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'fr 7/26/2019 15:48'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 currentUIDs
 
 	self
-		sendCommand: ICCommand allUIDs;
+		sendCommand: ImapCommand allUIDs;
 		fetchNextResponse.
 		
 	self 
@@ -1228,22 +1034,22 @@ currentUIDs
 		removeFirst; 
 		yourself)! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'ok 7/26/2019 21:01'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 currentUIDsFor: anICFolder
 
 	| isEmpty |
 		
 	self select: anICFolder path.
-	isEmpty := true.
+	isEmpty _ true.
 	
 	self lastResponse do:
 		[:line | (line findString: 'EXISTS') positive
-			ifTrue: [isEmpty := false]].
+			ifTrue: [isEmpty _ false]].
 	
 	isEmpty
 	ifFalse: [
 		self
-			sendCommand: ICCommand allUIDs;
+			sendCommand: ImapCommand allUIDs;
 			fetchNextResponse.
 		self 
 			uids: ((self lastResponse first subStrings: ' ') asOrderedCollection 
@@ -1252,7 +1058,7 @@ currentUIDsFor: anICFolder
 			yourself)]
 	ifTrue: [^ OrderedCollection new]! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'pm 7/15/2019 20:28'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'pm 7/15/2019 20:28'!
 fetchMailsBeginningAt: aBeginUID number: numberOfMessages 
 
 	| start end possibleUID numberToFetch |
@@ -1260,65 +1066,65 @@ fetchMailsBeginningAt: aBeginUID number: numberOfMessages
 	"aBeginUID is the last known UID of the folder. numberOfMessages is the number
 	 of messages which should be fetched starting at this UID"
 	
-	numberToFetch := numberOfMessages.
+	numberToFetch _ numberOfMessages.
 	
 	self currentUIDs.
-	possibleUID := self uids select: [:uid | uid asNumber < aBeginUID].
+	possibleUID _ self uids select: [:uid | uid asNumber < aBeginUID].
 	possibleUID size < numberToFetch
-		ifTrue: [numberToFetch := possibleUID size].
+		ifTrue: [numberToFetch _ possibleUID size].
 		
 	numberToFetch = 0 ifTrue: [^ OrderedCollection new].	
 		
-	possibleUID := possibleUID copyFrom: (possibleUID size - numberToFetch + 1) to: possibleUID size. 
+	possibleUID _ possibleUID copyFrom: (possibleUID size - numberToFetch + 1) to: possibleUID size. 
 		
-	start := possibleUID first.
-	end := possibleUID last.
+	start _ possibleUID first.
+	end _ possibleUID last.
 			
 	^ self maildirDiffFetchHeadersFrom: start asString to: end asString! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'pm 7/15/2019 20:37'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:16:43'!
 fetchNextResponse
 	
 	| multiLineResponse |
 
-	multiLineResponse := OrderedCollection new.
+	multiLineResponse _ OrderedCollection new.
 	self stream nextResponse.
 	self 
 		checkForBadRequest;
 		checkForParameterError.
 	
-	[ICParser commandSucceeded: self stream lastResponse]
+	[ImapParser commandSucceeded: self stream lastResponse]
 		whileFalse: [ 
 			multiLineResponse add: self stream lastResponse.
 			self stream nextResponse].
 	
 	self lastResponse: multiLineResponse! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'pm 7/15/2019 20:42'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 fillBodyFor: anEmail
 	
 	self 
-		sendCommand: (ICCommand fetchBody: anEmail messageID);
+		sendCommand: (ImapCommand fetchBody: anEmail messageID);
 		fetchNextResponse.
-	anEmail body: (ICParser parseFetchBody: self lastResponse)! !
+	anEmail body: (ImapParser parseFetchBody: self lastResponse)! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'js 6/14/2016 12:31'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'js 6/14/2016 12:31'!
 listAllFolders
 
 	^ self listFoldersIn: String empty using: '*'! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'pm 7/23/2019 14:51'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 listFoldersIn: root using: filter
 
 	self 
 		checkConnected;
 		checkLoggedIn.
 		
-	self sendCommand: (ICCommand listSubfoldersOf: root filterBy: filter).
+	self sendCommand: (ImapCommand listSubfoldersOf: root filterBy: filter).
 		
 	^ self parseListResponse! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'tg 7/15/2019 13:31'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'tg 7/15/2019 13:31'!
 maildirDiffFetchHeadersFrom: anUID
 
 	self uids
@@ -1326,107 +1132,107 @@ maildirDiffFetchHeadersFrom: anUID
 		ifNil: [^ OrderedCollection new]
 		ifNotNil: [^ self maildirDiffFetchHeadersFrom: (anUID + 1) to: (self uids last + 1)]! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'ok 7/26/2019 21:02'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 maildirDiffFetchHeadersFrom: start to: end
 
 	| searchBegin searchEnd mailFolder |
 
 	(FileDirectory default directoryExists: (FileDirectory default fullPathFor: self maildirFileName)) 
 		ifTrue: [
-			mailFolder := FileDirectory default on: self maildirFileName.
-			searchBegin := mailFolder	fileNamesMatching: (end asString).
-			searchEnd := mailFolder	fileNamesMatching: (start asString).
+			mailFolder _ FileDirectory default on: self maildirFileName.
+			searchBegin _ mailFolder	fileNamesMatching: (end asString).
+			searchEnd _ mailFolder	fileNamesMatching: (start asString).
 	
 			(searchBegin notEmpty and: [searchEnd notEmpty])
 				ifTrue: [^ OrderedCollection new]].
 
      ^ self
-       	sendCommand: (ICCommand fetchHeadersForUIDsFrom: start to: end);
+       	sendCommand: (ImapCommand fetchHeadersForUIDsFrom: start to: end);
 		fetchNextResponse;
 		parseFetchHeaders: self lastResponse! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'LW 8/1/2020 09:55'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'LW 8/1/2020 09:55'!
 retrieveBody: anEmail
 
 		self 
 			select: anEmail folder path;
 			fillBodyFor: anEmail.! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'pm 7/25/2019 17:45'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 retrieveFlagsFrom: anUID to: anotherUID in: aFolder
 	
 	self 
-		sendCommand: (ICCommand fetchFlagsForUIDsFrom: anUID to: anotherUID);
+		sendCommand: (ImapCommand fetchFlagsForUIDsFrom: anUID to: anotherUID);
 		fetchNextResponse.
 		
 	self parseFetchedFlagsAndPopulate: aFolder! !
 
-!ICEndPoint methodsFor: 'protocol handling - fetch' stamp: 'fr 7/26/2019 15:45'!
+!ImapEndPoint methodsFor: 'protocol handling - fetch' stamp: 'jpb 5/28/2021 19:18:13'!
 select: aFolderName
 
 	self	currentFolderName: aFolderName;
-		sendCommand: (ICCommand select: aFolderName);
+		sendCommand: (ImapCommand select: aFolderName);
 		fetchNextResponse! !
 
-!ICEndPoint methodsFor: 'protocol handling - delete' stamp: 'hg 7/31/2020 12:21'!
+!ImapEndPoint methodsFor: 'protocol handling - delete' stamp: 'jpb 5/28/2021 19:18:13'!
 deleteEmail: anEmail
 	
 	self select: anEmail folder path.
-	self sendCommand: (ICCommand deleteEmail: anEmail messageID).
+	self sendCommand: (ImapCommand deleteEmail: anEmail messageID).
 	self fetchNextResponse.
 	
 	self moveEmail: anEmail to: self folderNameOfTrash.! !
 
-!ICEndPoint methodsFor: 'protocol handling - delete' stamp: 'hg 7/31/2020 12:24'!
+!ImapEndPoint methodsFor: 'protocol handling - delete' stamp: 'hg 7/31/2020 12:24'!
 deleteMailLocally: anEmail
 
 	anEmail folder removeMail: anEmail.
 	self readWriter delete: anEmail! !
 
-!ICEndPoint methodsFor: 'protocol handling - delete' stamp: 'NH 8/2/2020 11:35'!
+!ImapEndPoint methodsFor: 'protocol handling - delete' stamp: 'jpb 5/28/2021 19:18:13'!
 expungeEmails
 
-	self sendCommand: ICCommand expungeEmails.	
+	self sendCommand: ImapCommand expungeEmails.	
 	self fetchNextResponse
 ! !
 
-!ICEndPoint methodsFor: 'protocol handling' stamp: 'ok 7/26/2019 17:45'!
+!ImapEndPoint methodsFor: 'protocol handling' stamp: 'jpb 5/28/2021 19:18:13'!
 folderFromResponse: responseLine
 
 	| folder folderPath parent namePart|
 	
 	
-	namePart := (responseLine copyAfter: ICCommand protocolQuote asCharacter).
+	namePart _ (responseLine copyAfter: ImapCommand protocolQuote asCharacter).
 	
-	folder := ICParser parseFolderPathFrom: namePart.
+	folder _ ImapParser parseFolderPathFrom: namePart.
 	self hierarchyDelimiter: folder hierarchyDelimiter.
-	folderPath := folder pathAsArray.
+	folderPath _ folder pathAsArray.
 	
 	(responseLine includesSubstring: '\Trash') ifTrue: [self folderNameOfTrash: folderPath first].
 	
-	parent := self rootFolder childFolderNamed: folderPath first 
-		ifAbsent: [ICFolder named: folderPath first in: self rootFolder with: self].
+	parent _ self rootFolder childFolderNamed: folderPath first 
+		ifAbsent: [ImapFolder named: folderPath first in: self rootFolder with: self].
 	
-	folderPath allButFirst do: [ :name | parent := parent childFolderNamed: name 
-		ifAbsent: [ICFolder named: name in: parent with: self]]! !
+	folderPath allButFirst do: [ :name | parent _ parent childFolderNamed: name 
+		ifAbsent: [ImapFolder named: name in: parent with: self]]! !
 
-!ICEndPoint methodsFor: 'protocol handling' stamp: 'NH 7/30/2020 22:13'!
+!ImapEndPoint methodsFor: 'protocol handling' stamp: 'jpb 5/28/2021 19:16:43'!
 parseFetchHeaders: headerLines
 
 	| folder parseResult mailCollection |
 	
 	headerLines ifEmpty: [^ OrderedCollection new].
 
-	mailCollection := OrderedCollection new.
-	parseResult := ICParser parseFetchMailStream: (ReadStream on: (headerLines joinSeparatedBy: Character cr)).
+	mailCollection _ OrderedCollection new.
+	parseResult _ ImapParser parseFetchMailStream: (ReadStream on: (headerLines joinSeparatedBy: Character cr)).
 		
-	folder := self rootFolder childFolderNamed: (self currentFolderName) with: (self hierarchyDelimiter).
+	folder _ self rootFolder childFolderNamed: (self currentFolderName) with: (self hierarchyDelimiter).
 	 
 	"iterate over all pairs of IDs and messages"
 	parseResult keysAndValuesDo: [:id :message | 
 		| mail |
 		"parse the message and ID into a ICMail"
-		mail := ICParser parseFetchHeader: message withId: id.
+		mail _ ImapParser parseFetchHeader: message withId: id.
 		mailCollection add: mail.
 		"store the ICMail in the appropriate folder and write it on the disk"
 		mail folder: folder.
@@ -1434,12 +1240,12 @@ parseFetchHeaders: headerLines
 	
 	^ mailCollection! !
 
-!ICEndPoint methodsFor: 'protocol handling' stamp: 'LW 8/2/2020 16:53'!
+!ImapEndPoint methodsFor: 'protocol handling' stamp: 'jpb 5/28/2021 19:16:43'!
 parseFetchedFlagsAndPopulate: aFolder
 
 	| flagsPerUID | 
 	
-	flagsPerUID := ICParser parseFetchedFlagsAndPopulate: self lastResponse.
+	flagsPerUID _ ImapParser parseFetchedFlagsAndPopulate: self lastResponse.
 	
 	aFolder emails do: [:email | 
 		flagsPerUID at: email uniqueID asString ifPresent: [:flags |
@@ -1448,13 +1254,13 @@ parseFetchedFlagsAndPopulate: aFolder
 			email deleted: (flags includes: '\Deleted').
 			self readWriter write: email]]! !
 
-!ICEndPoint methodsFor: 'protocol handling' stamp: 'tg 7/26/2019 14:20'!
+!ImapEndPoint methodsFor: 'protocol handling' stamp: 'tg 7/26/2019 14:20'!
 parseListResponse
 	
 	self fetchNextResponse.
 	self lastResponse do: [:each | self folderFromResponse: each]! !
 
-!ICEndPoint methodsFor: 'storage' stamp: 'hg 7/29/2020 10:50'!
+!ImapEndPoint methodsFor: 'storage' stamp: 'hg 7/29/2020 10:50'!
 maildirFileName
 
 	^ 'Maildir', 
@@ -1463,32 +1269,32 @@ maildirFileName
 		FileDirectory slash, 		
 		self currentFolderName copyReplaceAll: (self hierarchyDelimiter) with: (FileDirectory slash)! !
 
-!ICEndPoint methodsFor: 'protocol handling - flags' stamp: 'LW 8/1/2020 09:32'!
+!ImapEndPoint methodsFor: 'protocol handling - flags' stamp: 'LW 8/1/2020 09:32'!
 modifyFlag: aFlag for: anEmail
 	
 	(anEmail perform: aFlag)
 		ifTrue: [self resetFlag: anEmail and: aFlag]
 		ifFalse: [self setFlag: anEmail and: aFlag]! !
 
-!ICEndPoint methodsFor: 'protocol handling - flags' stamp: 'JJ 7/31/2020 13:55'!
+!ImapEndPoint methodsFor: 'protocol handling - flags' stamp: 'JJ 7/31/2020 13:55'!
 resetDeletedFlagWhenRecovering: anEmail
 
 	(anEmail folder folderName = self folderNameOfTrash)
 		ifTrue: [ self resetFlag: anEmail and: #deleted]! !
 
-!ICEndPoint methodsFor: 'protocol handling - flags' stamp: 'tg 7/26/2019 13:44'!
+!ImapEndPoint methodsFor: 'protocol handling - flags' stamp: 'jpb 5/28/2021 19:18:13'!
 resetFlag: anEmail and: aFlag
 	
-	self sendCommand: (ICCommand resetFlag: aFlag asString for: anEmail messageID).
+	self sendCommand: (ImapCommand resetFlag: aFlag asString for: anEmail messageID).
 	self fetchNextResponse! !
 
-!ICEndPoint methodsFor: 'protocol handling - flags' stamp: 'tg 7/26/2019 13:44'!
+!ImapEndPoint methodsFor: 'protocol handling - flags' stamp: 'jpb 5/28/2021 19:18:13'!
 setFlag: anEmail and: aFlag
 
-	self sendCommand: (ICCommand setFlag: aFlag asString for: anEmail messageID).	
+	self sendCommand: (ImapCommand setFlag: aFlag asString for: anEmail messageID).	
 	self fetchNextResponse! !
 
-!ICEndPoint methodsFor: 'protocol handling - move' stamp: 'JJ 7/31/2020 13:54'!
+!ImapEndPoint methodsFor: 'protocol handling - move' stamp: 'jpb 5/28/2021 19:18:13'!
 moveEmail: anEmail to: aFolder
 
 	self select: anEmail folder path.
@@ -1496,121 +1302,121 @@ moveEmail: anEmail to: aFolder
 	
 	self resetDeletedFlagWhenRecovering: anEmail.
 	
-	self sendCommand: (ICCommand moveEmail: anEmail messageID to: aFolder).		
+	self sendCommand: (ImapCommand moveEmail: anEmail messageID to: aFolder).		
 	self fetchNextResponse.
 	(self rootFolder childFolderNamed: aFolder with: (self hierarchyDelimiter)) update! !
 
-!ICEndPoint class methodsFor: 'constants' stamp: 'ok 7/26/2019 19:11'!
+!ImapEndPoint class methodsFor: 'constants' stamp: 'ok 7/26/2019 19:11'!
 accountFolderHashRelevantCharacters
 
 	^ 10! !
 
-!ICEndPoint class methodsFor: 'constants' stamp: 'tg 7/15/2019 13:26'!
+!ImapEndPoint class methodsFor: 'constants' stamp: 'tg 7/15/2019 13:26'!
 defaultStreamClass
 
 	^ SocketStream! !
 
-!ICEndPoint class methodsFor: 'constants' stamp: 'ok 7/26/2019 21:04'!
+!ImapEndPoint class methodsFor: 'constants' stamp: 'ok 7/26/2019 21:04'!
 refreshConnectionIntervalInSeconds
 
 	^ 60 * 10! !
 
-!ICEndPoint class methodsFor: 'configuration storage' stamp: 'LW 7/31/2020 11:42'!
+!ImapEndPoint class methodsFor: 'configuration storage' stamp: 'LW 7/31/2020 11:42'!
 addConfiguration: anAccountInfo
 	
 	self basicConnectionConfigurations add: anAccountInfo! !
 
-!ICEndPoint class methodsFor: 'configuration storage' stamp: 'tg 7/8/2019 15:14'!
+!ImapEndPoint class methodsFor: 'configuration storage' stamp: 'tg 7/8/2019 15:14'!
 basicConnectionConfigurations
 	
-	^ ConnectionConfigurations ifNil: [ConnectionConfigurations := OrderedCollection new]! !
+	^ ConnectionConfigurations ifNil: [ConnectionConfigurations _ OrderedCollection new]! !
 
-!ICEndPoint class methodsFor: 'configuration storage' stamp: 'tg 7/8/2019 15:14'!
+!ImapEndPoint class methodsFor: 'configuration storage' stamp: 'tg 7/8/2019 15:14'!
 connectionConfigurations
 
 	^ self basicConnectionConfigurations copy! !
 
-!ICEndPoint class methodsFor: 'configuration storage' stamp: 'pm 6/19/2019 14:49'!
+!ImapEndPoint class methodsFor: 'configuration storage' stamp: 'pm 6/19/2019 14:49'!
 connectionConfigurations: anOrderedCollection
 
-	ConnectionConfigurations := anOrderedCollection! !
+	ConnectionConfigurations _ anOrderedCollection! !
 
-!ICEndPoint class methodsFor: 'configuration storage' stamp: 'LW 7/31/2020 11:29'!
+!ImapEndPoint class methodsFor: 'configuration storage' stamp: 'LW 7/31/2020 11:29'!
 eraseStoredPasswords
 	self basicConnectionConfigurations do: [:anAccountInfo |
 		anAccountInfo eraseStoredPassword].! !
 
-!ICEndPoint class methodsFor: 'configuration storage' stamp: 'NH 7/15/2020 09:55'!
+!ImapEndPoint class methodsFor: 'configuration storage' stamp: 'NH 7/15/2020 09:55'!
 removeConfiguration: anAccountInfo
 
 	^ self basicConnectionConfigurations remove: anAccountInfo! !
 
-!ICEndPoint class methodsFor: 'errors' stamp: 'js 5/15/2016 13:55'!
+!ImapEndPoint class methodsFor: 'errors' stamp: 'js 5/15/2016 13:55'!
 errorBadProtocol
 
 	^ 'server protocol not supported'! !
 
-!ICEndPoint class methodsFor: 'errors' stamp: 'js 5/15/2016 16:15'!
+!ImapEndPoint class methodsFor: 'errors' stamp: 'js 5/15/2016 16:15'!
 errorInvalidConnectionConfiguration
 
 	^ 'the provided connection information is not valid'! !
 
-!ICFileReadWriter methodsFor: 'delete file' stamp: 'hg 8/2/2020 19:11'!
+!ImapFileReadWriter methodsFor: 'delete file' stamp: 'hg 8/2/2020 19:11'!
 delete: anICEmail
 
 	(FileDirectory default / self endpoint maildirFileName) deleteFileNamed: anICEmail uniqueID ifAbsent: [^ self]! !
 
-!ICFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 15:35'!
+!ImapFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 15:35'!
 directoryToFolderDictionary
 
 	^ directoryToFolderDictionary ifNil: [
-		directoryToFolderDictionary := Dictionary newFrom: {self rootDirectory -> self endpoint rootFolder}]! !
+		directoryToFolderDictionary _ Dictionary newFrom: {self rootDirectory -> self endpoint rootFolder}]! !
 
-!ICFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 14:09'!
+!ImapFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 14:09'!
 endpoint
 	^ endpoint! !
 
-!ICFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 14:09'!
+!ImapFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 14:09'!
 endpoint: anObject
-	endpoint := anObject! !
+	endpoint _ anObject! !
 
-!ICFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 13:56'!
+!ImapFileReadWriter methodsFor: 'accessing' stamp: 'hg 7/29/2020 13:56'!
 rootDirectory
 	
 	^ (FileDirectory default directoryNamed: 'Maildir') directoryNamed: self endpoint rootDirectoryName! !
 
-!ICFileReadWriter methodsFor: 'read file' stamp: 'hg 7/29/2020 14:18'!
+!ImapFileReadWriter methodsFor: 'read file' stamp: 'jpb 5/28/2021 19:17:04'!
 directoryVisitor
 	
 	^ [:directory | | currentFolder |
 		(directory = self rootDirectory) ifFalse: [
-			currentFolder := ICFolder
+			currentFolder _ ImapFolder
 				named: directory pathParts last
 				in: (self directoryToFolderDictionary at: directory containingDirectory)
 				with: self endpoint.
 			directoryToFolderDictionary at: directory put: currentFolder]]
 ! !
 
-!ICFileReadWriter methodsFor: 'read file' stamp: 'hg 7/30/2020 09:51'!
+!ImapFileReadWriter methodsFor: 'read file' stamp: 'jpb 5/28/2021 19:17:56'!
 fileVisitor
 
 	 ^ [:file | | currentFolder | 
-			currentFolder := self directoryToFolderDictionary at: file directory.
+			currentFolder _ self directoryToFolderDictionary at: file directory.
 			currentFolder addMails: {
-				(ICEmail newFromJsonStream: file) 
+				(ImapMailRecord newFromJsonStream: file) 
 					folder: currentFolder; 
 					yourself}.
 			file close]
 ! !
 
-!ICFileReadWriter methodsFor: 'read file' stamp: 'hg 7/29/2020 14:19'!
+!ImapFileReadWriter methodsFor: 'read file' stamp: 'hg 7/29/2020 14:19'!
 readEmailsFromDisk
 
 	self rootDirectory
 			assureExistence; 
 			withAllFilesDo: self fileVisitor andDirectoriesDo: self directoryVisitor! !
 
-!ICFileReadWriter methodsFor: 'write file' stamp: 'LW 8/2/2020 16:37'!
+!ImapFileReadWriter methodsFor: 'write file' stamp: 'LW 8/2/2020 16:37'!
 write: anICEmail
 	
 	(FileDirectory default / self endpoint maildirFileName) assureExistence.
@@ -1623,125 +1429,125 @@ write: anICEmail
 				flush; 
 				close]! !
 
-!ICFileReadWriter class methodsFor: 'instance creation' stamp: 'hg 7/29/2020 13:55'!
+!ImapFileReadWriter class methodsFor: 'instance creation' stamp: 'hg 7/29/2020 13:55'!
 newWith: anEndpoint
 
 	^self new
 		endpoint: anEndpoint;
 		yourself! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:06'!
+!ImapFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:06'!
 accountName
 
 	^ self endpoint accountInfo accountName! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:12'!
+!ImapFolder methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:12'!
 childFolders
 
-	^ childFolders ifNil: [childFolders := OrderedCollection new]! !
+	^ childFolders ifNil: [childFolders _ OrderedCollection new]! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'LW 7/31/2020 12:27'!
+!ImapFolder methodsFor: 'accessing' stamp: 'LW 7/31/2020 12:27'!
 emails
 
-	^ emails ifNil: [emails := OrderedCollection new]! !
+	^ emails ifNil: [emails _ OrderedCollection new]! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'LW 7/31/2020 12:26'!
+!ImapFolder methodsFor: 'accessing' stamp: 'LW 7/31/2020 12:26'!
 emails: anOrderedCollection
 
-	emails := anOrderedCollection! !
+	emails _ anOrderedCollection! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'ms 7/10/2016 13:24'!
+!ImapFolder methodsFor: 'accessing' stamp: 'ms 7/10/2016 13:24'!
 endpoint
 
 	^ endpoint! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:56'!
+!ImapFolder methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:56'!
 endpoint: anICEndpoint
 
-	endpoint := anICEndpoint! !
+	endpoint _ anICEndpoint! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'tg 7/19/2019 09:17'!
+!ImapFolder methodsFor: 'accessing' stamp: 'tg 7/19/2019 09:17'!
 folderName
 
-	^ folderName ifNil: [folderName := self class defaultName]! !
+	^ folderName ifNil: [folderName _ self class defaultName]! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'tg 7/19/2019 09:17'!
+!ImapFolder methodsFor: 'accessing' stamp: 'tg 7/19/2019 09:17'!
 folderName: aString
 
-	folderName := aString! !
+	folderName _ aString! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:02'!
+!ImapFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:02'!
 hierarchyDelimiter
 
 	^ self endpoint hierarchyDelimiter! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'pm 6/3/2019 18:34'!
+!ImapFolder methodsFor: 'accessing' stamp: 'pm 6/3/2019 18:34'!
 highestUniqueID
 	
 	(self emails) ifEmpty: [^ nil].
 		
 	^ (self emails detectMax: [:mail | mail uniqueID asNumber]) uniqueID! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'JJ 6/10/2020 10:47'!
+!ImapFolder methodsFor: 'accessing' stamp: 'JJ 6/10/2020 10:47'!
 isTrashFolder
 
 	^ self endpoint folderNameOfTrash = self folderName
 	! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'pm 6/3/2019 18:34'!
+!ImapFolder methodsFor: 'accessing' stamp: 'pm 6/3/2019 18:34'!
 lowestUniqueID
 	
 	(self emails) ifEmpty: [^ nil].
 		
 	^ (self emails detectMin: [:mail | mail uniqueID asNumber]) uniqueID! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'LW 8/2/2020 14:27'!
+!ImapFolder methodsFor: 'accessing' stamp: 'LW 8/2/2020 14:27'!
 numberOfUnseenMails
 
 	| numberOfUnseen |
 	
-	numberOfUnseen := self childFolders detectSum: [:anICFolder | anICFolder numberOfUnseenMails].
+	numberOfUnseen _ self childFolders detectSum: [:anICFolder | anICFolder numberOfUnseenMails].
 	^ (numberOfUnseen + (self emails count: [:anICEmail | anICEmail seen not]))! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'tg 6/25/2019 21:21'!
+!ImapFolder methodsFor: 'accessing' stamp: 'tg 6/25/2019 21:21'!
 parent
 
 	^ parent! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'js 6/7/2016 11:32'!
+!ImapFolder methodsFor: 'accessing' stamp: 'js 6/7/2016 11:32'!
 parent: anICFolder
 
-	parent := anICFolder! !
+	parent _ anICFolder! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:08'!
+!ImapFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:08'!
 parentPath
 
 	^ self parent path! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'tg 7/25/2019 12:56'!
+!ImapFolder methodsFor: 'accessing' stamp: 'tg 7/25/2019 12:56'!
 recursiveChildFolders
 	
 	^ {self childFolders collect: [:child | child recursiveChildFolders]. self childFolders} flatten asOrderedCollection! !
 
-!ICFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:05'!
+!ImapFolder methodsFor: 'accessing' stamp: 'ok 7/26/2019 19:05'!
 rootFolder
 
 	^ self endpoint rootFolder! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'js 6/7/2016 13:09'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'js 6/7/2016 13:09'!
 addFolder: child
 
 	child parent: self.
 	self childFolders add: child! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'tg 7/19/2019 09:19'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'tg 7/19/2019 09:19'!
 childFolderNamed: childFolderName ifAbsent: block
 
 	^ self childFolders 
 		detect: [:child | child folderName = childFolderName] 
 		ifNone: [block value]! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 6/26/2018 11:01'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 6/26/2018 11:01'!
 childFolderNamed: name with: delimiter
 
 	^ self 
@@ -1749,7 +1555,7 @@ childFolderNamed: name with: delimiter
 			with: delimiter 
 			ifAbsent: [Error signal: self class errorChildDoesNotExist]! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'tg 7/26/2019 21:52'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'tg 7/26/2019 21:52'!
 childFolderNamed: childFolderName with: delimiter ifAbsent: block
 
 	| rootPart childPart child parts |
@@ -1758,33 +1564,33 @@ childFolderNamed: childFolderName with: delimiter ifAbsent: block
 		detect: [:subFolder | subFolder folderName = childFolderName] 
 		ifNone: [ 
 			"splice at delimiter and ask child"
-			parts := childFolderName subStrings: delimiter.
+			parts _ childFolderName subStrings: delimiter.
 			(parts size > 1)
 				ifTrue: [
-					rootPart := parts first.
-					childPart := parts allButFirst joinSeparatedBy: delimiter.
-					child := self childFolders detect: [ :childFolder | childFolder folderName = rootPart].
+					rootPart _ parts first.
+					childPart _ parts allButFirst joinSeparatedBy: delimiter.
+					child _ self childFolders detect: [ :childFolder | childFolder folderName = rootPart].
 					child ifNotNil: [^ child childFolderNamed: childPart with: delimiter ifAbsent: block]].
 			^ block value]! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 7/25/2018 14:02'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 7/25/2018 14:02'!
 countFolders
 
 	^ self childFolders inject: self childFolders size into: [:count :child | count + child countFolders]! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'ok 7/26/2019 19:08'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'ok 7/26/2019 19:08'!
 path
 
 	^ (self parent == self rootFolder) 
 		ifTrue: [ self folderName ] 
 		ifFalse: [ self parentPath, self hierarchyDelimiter, self folderName]! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 7/25/2018 14:03'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 7/25/2018 14:03'!
 removeFolder: child
 
 	^ self removeFolder: child ifAbsent: [Error signal: self class errorChildDoesNotExist]! !
 
-!ICFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 7/25/2018 14:04'!
+!ImapFolder methodsFor: 'action - folder hierarchy' stamp: 'C.G. 7/25/2018 14:04'!
 removeFolder: child ifAbsent: block
 
 	(self childFolders includes: child) ifFalse: [^ block value].
@@ -1792,13 +1598,13 @@ removeFolder: child ifAbsent: block
 	child parent: child.
 	self childFolders remove: child! !
 
-!ICFolder methodsFor: 'action - add emails' stamp: 'LW 8/1/2020 10:14'!
+!ImapFolder methodsFor: 'action - add emails' stamp: 'LW 8/1/2020 10:14'!
 addMails: aMailCollection
 
 	"Since Exchange uses other objects than emails we need to exclude them from the list"
 	self emails addAll: (self sanitizeMailCollection: aMailCollection).! !
 
-!ICFolder methodsFor: 'action - freshness' stamp: 'JJ 8/2/2020 15:52'!
+!ImapFolder methodsFor: 'action - freshness' stamp: 'JJ 8/2/2020 15:52'!
 ensureFreshness
 	
 	" This method is part of a good first issue with no. 366 :)"
@@ -1807,21 +1613,21 @@ ensureFreshness
 	self emails ifEmpty: [^ self].
 	
 	" we cant access first and last of the sortedCollection because its sorted by date, not by UID "
-	min := self lowestUniqueID.
-	max := self highestUniqueID.
+	min _ self lowestUniqueID.
+	max _ self highestUniqueID.
 		
 	self endpoint currentUIDs.
 	
-	relevantUIDs := self endpoint uids select: [ :uid | (uid asNumber <= max) and: [uid asNumber >=min]].
+	relevantUIDs _ self endpoint uids select: [ :uid | (uid asNumber <= max) and: [uid asNumber >=min]].
 
 	"search for uids, which are in storage, but not on the server --> they were moved"
-	localMails := self emails copy.
+	localMails _ self emails copy.
 	relevantUIDs do: [ :uid | localMails removeAllSuchThat: [ :mail | mail uniqueID = uid]].
 	
 	"everything left in localMails has changed, and therefore can be removed"
 	localMails do: [ :mail | self endpoint deleteMailLocally: mail]! !
 
-!ICFolder methodsFor: 'action - remove emails' stamp: 'NH 8/2/2020 11:36'!
+!ImapFolder methodsFor: 'action - remove emails' stamp: 'NH 8/2/2020 11:36'!
 expungeEmails
 	
 	self emails do: [ :email |
@@ -1831,12 +1637,12 @@ expungeEmails
 		expungeEmails
 ! !
 
-!ICFolder methodsFor: 'action - remove emails' stamp: 'tg 7/26/2019 21:59'!
+!ImapFolder methodsFor: 'action - remove emails' stamp: 'tg 7/26/2019 21:59'!
 removeMail: anICEmail
 
 	self emails remove: anICEmail.! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:52'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:52'!
 fetchHeadersFrom: anUID
 	
 	self emails addAll: (self endpoint
@@ -1847,20 +1653,20 @@ fetchHeadersFrom: anUID
 	self emails ifEmpty: [^ self].
 	self retrieveFlagsFrom: self emails last uniqueID to: self emails first uniqueID! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'LW 8/2/2020 14:35'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'LW 8/2/2020 14:35'!
 fetchNumberOfLatestEmails: aNumber
 
 	| startUID allUIDs |
 	
 	self endpoint currentUIDsFor: self.
-	allUIDs := self endpoint uids.
+	allUIDs _ self endpoint uids.
 	allUIDs ifEmpty: [^ OrderedCollection new].
 	(allUIDs size - aNumber) strictlyPositive
-		ifTrue: [startUID := allUIDs at: (allUIDs size - aNumber)]
-		ifFalse: [startUID := (allUIDs first) - 1].
+		ifTrue: [startUID _ allUIDs at: (allUIDs size - aNumber)]
+		ifFalse: [startUID _ (allUIDs first) - 1].
 	self fetchHeadersFrom: startUID! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'tg 7/26/2019 21:05'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'tg 7/26/2019 21:05'!
 loadOlderMails
 
 	self emails addAll: 
@@ -1868,26 +1674,26 @@ loadOlderMails
 			currentUIDsFor: self;
 			fetchMailsBeginningAt: self lowestUniqueID number: self class numberOfHeadersToFetchAtLoadOlderMails)! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:36'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:36'!
 modifyFlag: aFlag for: anEmail
 
 	self retrieveFlagsFor: anEmail.
 	self endpoint modifyFlag: aFlag for: anEmail! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:25'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:25'!
 retrieveFlagsFor: anEmail
 	
 	self retrieveFlagsFrom: anEmail uniqueID to: anEmail uniqueID
 ! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:33'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'JJ 8/2/2020 15:33'!
 retrieveFlagsFrom: anUID to: anotherUID
 
 	self endpoint 
 		select: self path;
 		retrieveFlagsFrom: anUID to: anotherUID in: self! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'LW 8/2/2020 14:34'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'LW 8/2/2020 14:34'!
 startUpdateProcess: anUID
 
 	(self folderName = 'root') ifTrue: [^self].
@@ -1898,13 +1704,13 @@ startUpdateProcess: anUID
 	on: Error
 	do: [:e | self inform: e asString]! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'pm 6/3/2019 18:34'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'pm 6/3/2019 18:34'!
 update
 
 	self startUpdateProcess: self highestUniqueID.	
 	self childFolders do: [:anICFolder | anICFolder update]! !
 
-!ICFolder methodsFor: 'action - update emails' stamp: 'LW 6/3/2020 15:13'!
+!ImapFolder methodsFor: 'action - update emails' stamp: 'LW 6/3/2020 15:13'!
 updateAndShowProgressWith: aBlock
 	
 	ProgressNotification 
@@ -1914,37 +1720,37 @@ updateAndShowProgressWith: aBlock
 	self startUpdateProcess: self highestUniqueID.
 	self childFolders do: [:anICFolder | anICFolder updateAndShowProgressWith: aBlock]! !
 
-!ICFolder methodsFor: 'action - sanitize emails' stamp: 'LW 5/20/2020 09:49'!
+!ImapFolder methodsFor: 'action - sanitize emails' stamp: 'LW 5/20/2020 09:49'!
 sanitizeMailCollection: aMailCollection
 	
 	^ aMailCollection select: [:mail | mail date notEmpty]! !
 
-!ICFolder class methodsFor: 'constants' stamp: 'js 6/7/2016 11:49'!
+!ImapFolder class methodsFor: 'constants' stamp: 'js 6/7/2016 11:49'!
 defaultName
 
 	^ 'root'! !
 
-!ICFolder class methodsFor: 'constants' stamp: 'DH 7/22/2018 22:37'!
+!ImapFolder class methodsFor: 'constants' stamp: 'DH 7/22/2018 22:37'!
 numberOfHeadersToFetchAtLoadOlderMails
 
 	^ 10! !
 
-!ICFolder class methodsFor: 'constants' stamp: 'DH 7/22/2018 22:37'!
+!ImapFolder class methodsFor: 'constants' stamp: 'DH 7/22/2018 22:37'!
 numberOfHeadersToFetchAtTheBeginning
 
 	^ 100! !
 
-!ICFolder class methodsFor: 'errors' stamp: 'js 6/14/2016 09:27'!
+!ImapFolder class methodsFor: 'errors' stamp: 'js 6/14/2016 09:27'!
 errorChildDoesNotExist
 
 	^ 'Child does not exist'! !
 
-!ICFolder class methodsFor: 'instance creation' stamp: 'tg 7/19/2019 09:19'!
+!ImapFolder class methodsFor: 'instance creation' stamp: 'tg 7/19/2019 09:19'!
 named: name in: parent with: endpoint
 
 	| newFolder |
 	
-	newFolder := (self new)
+	newFolder _ (self new)
 		folderName: name;
 		endpoint: endpoint.
 		
@@ -1952,45 +1758,306 @@ named: name in: parent with: endpoint
 	
 	^ newFolder! !
 
-!ICFolder class methodsFor: 'instance creation' stamp: 'C.G. 7/25/2018 14:12'!
+!ImapFolder class methodsFor: 'instance creation' stamp: 'C.G. 7/25/2018 14:12'!
 newRootFolderWith: endpoint
 	
 	| newFolder |
 	
-	newFolder := self new.
+	newFolder _ self new.
 	newFolder endpoint: endpoint.
 		
 	^ newFolder! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 16:34'!
+!ImapMailRecord methodsFor: 'comparing' stamp: 'hg 7/30/2020 11:06'!
+= anObject
+	"Answer whether the receiver and anObject represent the same object."
+
+	self == anObject
+		ifTrue: [ ^ true ].
+	self class = anObject class
+		ifFalse: [ ^ false ].
+	^ self header = anObject header
+		and: [ 
+			self messageID = anObject messageID
+				and: [ self body = anObject body and: [ self folder = anObject folder and: [ self uniqueID = anObject uniqueID ] ] ] ]! !
+
+!ImapMailRecord methodsFor: 'comparing' stamp: 'hg 7/30/2020 11:06'!
+hash
+	"Answer an integer value that is related to the identity of the receiver."
+
+	^ self header hash
+		bitXor: (self messageID hash bitXor: (self body hash bitXor: (self folder hash bitXor: self uniqueID hash)))! !
+
+!ImapMailRecord methodsFor: 'converting' stamp: 'AR 7/28/2016 14:06'!
+asString
+
+	^ self headerAsString, String cr, String cr, self bodyAsString, String cr! !
+
+!ImapMailRecord methodsFor: 'converting' stamp: 'AR 7/28/2016 13:58'!
+bodyAsString
+
+	^ self body asString
+
+	! !
+
+!ImapMailRecord methodsFor: 'converting' stamp: 'C.G. 7/25/2018 13:47'!
+headerAsString
+
+	| headerFields |
+	
+	headerFields _ self header keys sorted.
+	^ (headerFields collect: [:headerField |
+		headerField, ': ', (self header at: headerField)]) joinSeparatedBy: String cr! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/3/2019 21:27'!
+body
+
+	^ body ifNil: [body _ String empty]! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:34'!
+body: aString
+
+	body _ aString! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'tg 7/19/2019 11:31'!
+dateFormatted
+
+	| date formatted |
+		
+	date _ DateAndTime fromSeconds: self dateInSecondsSinceSqueakEpoch + DateAndTime localOffset asSeconds.
+	
+	formatted _ ((date dayOfMonth asString padded: #left to: 2 with: $0) ,'.', 
+			 (date month asString padded: #left to: 2 with: $0), '.',
+			 (date year asString padded: #left to: 2 with: $0),' ',
+			 (date hour24 asString padded: #left to: 2 with: $0),':',
+			 (date minute asString padded: #left to: 2 with: $0)).
+			
+	^ formatted! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'tg 7/26/2019 21:04'!
+dateInSecondsSince1980
+	
+	^ MailMessage new timeFrom: self date
+! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'tg 7/19/2019 10:35'!
+dateInSecondsSinceSqueakEpoch	
+	
+	^ self dateInSecondsSince1980 + (DateAndTime year: 1980 day: 1) asSeconds
+! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'ms 7/10/2016 13:31'!
+folder
+
+	^ folder! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/14/2019 14:44'!
+folder: anICFolder
+
+	folder _ anICFolder! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/3/2019 21:28'!
+header
+
+	^ header ifNil: [header _ Dictionary new]! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:37'!
+header: aDictionary
+
+	header _ aDictionary! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'ms 7/10/2016 13:59'!
+messageID
+
+	^ messageID! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:41'!
+messageID: aNumber
+
+	messageID _ aNumber! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'hg 7/29/2020 15:25'!
+serializeToJson
+
+	^ Json render: (
+		JsonObject newFrom: {
+			'header' -> (JsonObject newFrom: self header).
+			'body' -> self body.
+			'messageID' -> self messageID.
+			'uid' -> self uniqueID})! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/2/2019 15:58'!
+uniqueID
+
+	^ uniqueID ifNil: [uniqueID _ 0]! !
+
+!ImapMailRecord methodsFor: 'accessing' stamp: 'pm 6/2/2019 15:58'!
+uniqueID: aString
+
+	uniqueID _ aString! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
+contentTransferEncoding
+
+	^ self header at: #contentTransferEncoding ifAbsent: String empty! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
+contentTransferEncoding: aContentTransferEncoding
+
+	self header at: #contentTransferEncoding put: aContentTransferEncoding! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
+contentType
+
+	^ self header at: #contentType ifAbsent: String empty! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
+contentType: aContentType
+
+	self header at: #contentType put: aContentType! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
+date
+
+	^ self header at: #date ifAbsent: String empty! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:46'!
+date: aDate
+
+	self header at: #date put: aDate! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'DH 7/19/2018 21:58'!
+deleted
+
+	^ self header at: #deleted ifAbsent: [false]! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'DH 7/19/2018 19:43'!
+deleted: aFlag
+
+	self header at: #deleted put: aFlag ! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'LW 8/1/2020 12:06'!
+deserializeFrom: aJson
+
+	self header: (Dictionary newFrom: (aJson at: 'header' ifAbsent: [JsonObject new]));
+		body: (aJson at: 'body');
+		messageID: (aJson at: 'messageID');
+		uniqueID: (aJson at: 'uid')! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
+flagged
+
+	^ self header at: #flagged ifAbsent: false! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
+flagged: aFlag
+
+	self header at: #flagged put: aFlag! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
+from
+
+	^ self header at: #from ifAbsent: String empty! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:47'!
+from: aSender
+
+	self header at: #from put: aSender! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
+seen
+
+	^ self header at: #seen ifAbsent: true! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
+seen: aFlag
+
+	self header at: #seen put: aFlag! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'hg 7/3/2020 16:10'!
+sender
+
+	| fromCollection |
+	fromCollection _ self from findBetweenSubStrs: '<>'.
+	^ (fromCollection at: 2 ifAbsent: [fromCollection at: 1 ifAbsent: [ '' ]])! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'LW 8/2/2020 13:58'!
+senderAddressFromHeader
+
+	^ (MailAddressParser addressesIn: self from) first! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'tg 7/19/2019 11:45'!
+subject
+
+	^ self header at: #subject ifAbsent: String empty! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
+subject: aSubject
+
+	self header at: #subject put: aSubject! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'hg 7/30/2020 11:25'!
+to
+
+	^ self header at: #to ifAbsent: Array new! !
+
+!ImapMailRecord methodsFor: 'accessing-header' stamp: 'C.G. 7/25/2018 13:49'!
+to: aReceiver
+
+	self header at: #to put: aReceiver! !
+
+!ImapMailRecord methodsFor: 'action' stamp: 'lvm 5/20/2018 20:10'!
+open
+
+	ICEmailDialog openWith: self! !
+
+!ImapMailRecord methodsFor: 'action' stamp: 'JJ 8/2/2020 15:33'!
+retrieveBody
+	
+	"this is the only action that the email has to be responsible for, because it is called when an email is opened"
+	self folder endpoint retrieveBody: self.
+
+	^'Content-Type: ', (self contentType), Character cr,
+		'Content-Transfer-Encoding: ', self contentTransferEncoding,
+		Character cr, Character cr, self body! !
+
+!ImapMailRecord class methodsFor: 'instance creation' stamp: 'hg 7/30/2020 09:50'!
+newFromJsonStream: aStream
+	
+	^ self basicNew
+		deserializeFrom: (Json readFrom: aStream);
+		initialize;
+		yourself! !
+
+!ImapParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 16:34'!
 buildFlagsAssociationFor: aUidString from: aLineString
 
 	^ Association key: aUidString first value: (self flags select: [:flag |
 			aLineString includesSubstring: flag])! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 16:25'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 16:25'!
 chop: aHeaderString forEmail: anEmail
 
 	| headerChunks |
 
-	headerChunks := OrderedCollection new.
+	headerChunks _ OrderedCollection new.
 	(aHeaderString subStrings: Character cr asString) do: [:line |
 		self parse: line forHeaderChunks: headerChunks forEmail: anEmail].
 
 	^ headerChunks! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:09'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:09'!
 closeEmailContentFrom: aStream for: anEmailString
 
 	anEmailString nextPutAll: (aStream nextDelimited: $)).
 	aStream next! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/15/2019 20:40'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/15/2019 20:40'!
 commandSucceeded: aResponseString
 
 	^ aResponseString beginsWith: self commandSucceeded! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 15:44'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 15:44'!
 continueHeaderChunks: aCollection withLine: aString
 
 	(self startsNewHeaderChunk: aString)
@@ -1999,32 +2066,32 @@ continueHeaderChunks: aCollection withLine: aString
 			aCollection ifNotEmpty: [
 				aCollection last add: aString]]! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:07'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:07'!
 continueMailStream: aStream into: anEmailStringCollection
 
 	| id |
 
-	id := self readMessageIdFromStream: aStream. 
+	id _ self readMessageIdFromStream: aStream. 
 	anEmailStringCollection at: id put: (String streamContents: [:email |
 		self extractEmailContentFrom: aStream for: email])! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:25'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:25'!
 extractEmailContentFrom: aStream for: anEmailString
 
 	| octetSize |
 
-	octetSize := self readOctetSizeFrom: aStream for: anEmailString.
+	octetSize _ self readOctetSizeFrom: aStream for: anEmailString.
 	self readEmailContentFrom: aStream for: anEmailString bySize: octetSize.
 	self closeEmailContentFrom: aStream for: anEmailString! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 11:16'!
+!ImapParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 11:16'!
 parse: aString forHeaderChunks: aHeaderChunksCollection forEmail: anEmail
 
 	(aString includesSubstring: 'UID')	
 		ifTrue: [anEmail uniqueID: ((aString subStrings: ' ') second)]
 		ifFalse: [self continueHeaderChunks: aHeaderChunksCollection withLine: aString]! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 18:12'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 18:12'!
 parseFetchBody: aResponseStringArray
 
 	^ ((aResponseStringArray 
@@ -2032,47 +2099,47 @@ parseFetchBody: aResponseStringArray
 		to: (aResponseStringArray size - 1))
 			joinSeparatedBy: Character cr)! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 18:01'!
+!ImapParser class methodsFor: 'parsing' stamp: 'jpb 5/28/2021 19:17:56'!
 parseFetchHeader: aHeaderString withId: aMessageID
 
 	| email |
 
-	email := ICEmail new messageID: aMessageID.
+	email _ ImapMailRecord new messageID: aMessageID.
 	self populate: email withHeaderChunks: (self chop: aHeaderString forEmail: email).
 
 	^ email! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 16:57'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 16:57'!
 parseFetchMailStream: aStream
 
 	| emails |
 
-	emails := Dictionary new.
+	emails _ Dictionary new.
 	[aStream atEnd] whileFalse: [self continueMailStream: aStream into: emails].
 
 	 ^ emails! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:39'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:39'!
 parseFetchedFlagsAndPopulate: aResponseStringArray
 	
 	| uidPart uid |
 	
  	^ (aResponseStringArray collect: [:line |
-		uidPart := (line allRegexMatches: 'UID \d*') ifEmpty: [ ^ Dictionary new].
-		uid := (uidPart first allRegexMatches: '[\d]+') ifEmpty: [ ^ Dictionary new].
+		uidPart _ (line allRegexMatches: 'UID \d*') ifEmpty: [ ^ Dictionary new].
+		uid _ (uidPart first allRegexMatches: '[\d]+') ifEmpty: [ ^ Dictionary new].
 		self buildFlagsAssociationFor: uid from: line]) as: Dictionary! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 18:06'!
+!ImapParser class methodsFor: 'parsing' stamp: 'jpb 5/28/2021 19:16:32'!
 parseFolderPathFrom: aResponseString
 
 	| splittedResponse |
 
-	splittedResponse := self splitFolderPathResponse: aResponseString.
-	^ ICProtocolFolder
+	splittedResponse _ self splitFolderPathResponse: aResponseString.
+	^ ImapProtocolFolder
 		newWithPath: (splittedResponse allButFirst joinSeparatedBy: ' ')
 		delimitedBy: splittedResponse first! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:58'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:58'!
 parseHeaderContentFrom: aHeaderChunk
 
 	^ ((aHeaderChunk joinSeparatedBy: ' ')
@@ -2080,172 +2147,172 @@ parseHeaderContentFrom: aHeaderChunk
 		to: (aHeaderChunk first indexOf: $:) 
 		with: String empty) withoutLeadingBlanks! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 16:34'!
+!ImapParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 16:34'!
 parseHeaderFieldFrom: aHeaderChunk
 
 	| headerField |
 	
-	headerField := (aHeaderChunk first subStrings: ' ') first.
-	(headerField includesSubstring: ':') ifTrue: [headerField := headerField allButLast].
+	headerField _ (aHeaderChunk first subStrings: ' ') first.
+	(headerField includesSubstring: ':') ifTrue: [headerField _ headerField allButLast].
 
 	^ headerField! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:36'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:36'!
 populate: anEmail withContentTransferEncoding: aHeaderChunk
 	
 	anEmail contentTransferEncoding: aHeaderChunk! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:37'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:37'!
 populate: anEmail withContentType: aHeaderChunk
 	
 	anEmail contentType: aHeaderChunk! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:37'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:37'!
 populate: anEmail withDate: aHeaderChunk
 	
 	anEmail date: aHeaderChunk! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 16:34'!
+!ImapParser class methodsFor: 'parsing' stamp: 'LW 5/6/2020 16:34'!
 populate: anEmail withFlags: aHeaderChunk
 
 	anEmail seen: (aHeaderChunk includesSubstring: '\Seen').
 	anEmail flagged: (aHeaderChunk includesSubString: '\Flagged').
 	anEmail deleted: (aHeaderChunk includesSubString: '\Deleted')! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 16:24'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 16:24'!
 populate: anEmail withHeaderChunks: aHeaderChunkCollection
 
 	aHeaderChunkCollection do: [:chunk |
 		self populate: anEmail withHeadersFrom: chunk]! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:58'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:58'!
 populate: anEmail withHeadersFrom: aHeaderChunk
 
 	| headerField headerContent method |
 	
-	headerField := self parseHeaderFieldFrom: aHeaderChunk.
-	headerContent := self parseHeaderContentFrom: aHeaderChunk.
-	method := 	(self parseMethods at: headerField ifAbsent: nil).
+	headerField _ self parseHeaderFieldFrom: aHeaderChunk.
+	headerContent _ self parseHeaderContentFrom: aHeaderChunk.
+	method _ 	(self parseMethods at: headerField ifAbsent: nil).
 	method ifNil: [Transcript show: 'WARNING: No method for parsing Header field:', headerField; cr]
 		ifNotNil: [method value: headerContent value: anEmail]! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'hg 7/30/2020 11:31'!
+!ImapParser class methodsFor: 'parsing' stamp: 'hg 7/30/2020 11:31'!
 populate: anEmail withReceiver: aHeaderChunk
 
 	anEmail to: (aHeaderChunk subStrings: ',') asArray! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:38'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:38'!
 populate: anEmail withSender: aHeaderChunk
 
 	anEmail from: aHeaderChunk! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'tg 7/26/2019 21:01'!
+!ImapParser class methodsFor: 'parsing' stamp: 'tg 7/26/2019 21:01'!
 populate: anEmail withSubject: aHeaderChunk
 
 	[anEmail subject: aHeaderChunk decodeMimeHeader]
 		on: Error
 		do: [self inform: ('A mail in your account has a undecodeable MIME header')]! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'tg 7/26/2019 21:04'!
+!ImapParser class methodsFor: 'parsing' stamp: 'tg 7/26/2019 21:04'!
 readEmailContentCharacterFrom: aStream for: anEmailString
 
 	| char |
 
-	char := (aStream next) asCharacter.
+	char _ (aStream next) asCharacter.
 	anEmailString nextPut: char.
 	(char = Character cr) ifTrue: [^2].
 	^ 1! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:21'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:21'!
 readEmailContentFrom: aStream for: anEmailString bySize: anOctetSize
 
 	| charsLeft |
 	
-	charsLeft := anOctetSize.
+	charsLeft _ anOctetSize.
 	[charsLeft > 0] whileTrue: [
-		charsLeft := charsLeft - (self readEmailContentCharacterFrom: aStream for: anEmailString)].! !
+		charsLeft _ charsLeft - (self readEmailContentCharacterFrom: aStream for: anEmailString)].! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:07'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:07'!
 readMessageIdFromStream: aStream
 
 	| id |
 
 	aStream next: self lengthOfEmailPrefix.
-	id := aStream nextDelimited: Character space.
+	id _ aStream nextDelimited: Character space.
 	aStream next: self lengthOfFetchPrefix.
 	
 	^ id! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:24'!
+!ImapParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 17:24'!
 readOctetSizeFrom: aStream for: anEmailString
 
 	anEmailString nextPutAll: (aStream nextDelimited: ${).
 	^ (aStream nextDelimited: $}) asNumber! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:51'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:51'!
 responseIsError: aResponseString
 
 	^ aResponseString beginsWith: self protocolError! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/25/2019 17:53'!
+!ImapParser class methodsFor: 'parsing' stamp: 'jpb 5/28/2021 19:18:13'!
 responseIsParameterError: aResponseString
 
 	^ self protocolParameterError = 
-		((aResponseString subStrings: ICCommand protocolBlank) 
+		((aResponseString subStrings: ImapCommand protocolBlank) 
 			at: self parameterErrorPosition)! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'ok 7/26/2019 18:04'!
+!ImapParser class methodsFor: 'parsing' stamp: 'jpb 5/28/2021 19:18:13'!
 splitFolderPathResponse: aResponseString
 
-	^ (aResponseString copyReplaceAll: ICCommand protocolQuote with: String empty)
-		subStrings: ICCommand protocolBlank! !
+	^ (aResponseString copyReplaceAll: ImapCommand protocolQuote with: String empty)
+		subStrings: ImapCommand protocolBlank! !
 
-!ICParser class methodsFor: 'parsing' stamp: 'pm 7/12/2019 20:07'!
+!ImapParser class methodsFor: 'parsing' stamp: 'pm 7/12/2019 20:07'!
 startsNewHeaderChunk: aLine
 
 	^ (aLine subStrings: ' ') first endsWith: ':'! !
 
-!ICParser class methodsFor: 'responses' stamp: 'pm 7/25/2019 17:26'!
+!ImapParser class methodsFor: 'responses' stamp: 'jpb 5/28/2021 19:18:13'!
 commandSucceeded
 
-	^ {ICCommand protocolCommandStart . 'OK'} joinSeparatedBy: ICCommand protocolBlank! !
+	^ {ImapCommand protocolCommandStart . 'OK'} joinSeparatedBy: ImapCommand protocolBlank! !
 
-!ICParser class methodsFor: 'responses' stamp: 'pm 7/25/2019 17:26'!
+!ImapParser class methodsFor: 'responses' stamp: 'jpb 5/28/2021 19:18:13'!
 protocolError
 
-	^ {ICCommand protocolCommandStart . 'BAD'} joinSeparatedBy: ICCommand protocolBlank! !
+	^ {ImapCommand protocolCommandStart . 'BAD'} joinSeparatedBy: ImapCommand protocolBlank! !
 
-!ICParser class methodsFor: 'responses' stamp: 'pm 7/12/2019 17:22'!
+!ImapParser class methodsFor: 'responses' stamp: 'pm 7/12/2019 17:22'!
 protocolParameterError
 
 	^ 'NO'! !
 
-!ICParser class methodsFor: 'constants' stamp: 'ok 7/26/2019 18:10'!
+!ImapParser class methodsFor: 'constants' stamp: 'ok 7/26/2019 18:10'!
 fetchBodyOffset
 
 	^ 2! !
 
-!ICParser class methodsFor: 'constants' stamp: 'pm 7/12/2019 18:35'!
+!ImapParser class methodsFor: 'constants' stamp: 'pm 7/12/2019 18:35'!
 flags
 
 	^ {'\Seen'. '\Deleted'. '\Flagged'}! !
 
-!ICParser class methodsFor: 'constants' stamp: 'ok 7/26/2019 16:31'!
+!ImapParser class methodsFor: 'constants' stamp: 'ok 7/26/2019 16:31'!
 lengthOfEmailPrefix
 	
 	^ '* ' size! !
 
-!ICParser class methodsFor: 'constants' stamp: 'mt 7/26/2019 15:44'!
+!ImapParser class methodsFor: 'constants' stamp: 'mt 7/26/2019 15:44'!
 lengthOfFetchPrefix
 	
 	^ 'FETCH (' size! !
 
-!ICParser class methodsFor: 'constants' stamp: 'pm 7/23/2019 13:31'!
+!ImapParser class methodsFor: 'constants' stamp: 'pm 7/23/2019 13:31'!
 parameterErrorPosition
 
 	^ 2! !
 
-!ICParser class methodsFor: 'constants' stamp: 'pm 7/25/2019 17:40'!
+!ImapParser class methodsFor: 'constants' stamp: 'pm 7/25/2019 17:40'!
 parseMethods
 
 	^ Dictionary newFrom: {
@@ -2258,152 +2325,467 @@ parseMethods
 		'Content-Transfer-Encoding' -> [:headerChunk :email | 
 			self populate: email withContentTransferEncoding: headerChunk]}! !
 
-!ICProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:04'!
+!ImapProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:04'!
 folderPath
 
 	^ folderPath! !
 
-!ICProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:05'!
+!ImapProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:05'!
 folderPath: aFolderPathString
 
-	folderPath := aFolderPathString! !
+	folderPath _ aFolderPathString! !
 
-!ICProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:00'!
+!ImapProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:00'!
 hierarchyDelimiter
 
 	^ hierarchyDelimiter! !
 
-!ICProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:00'!
+!ImapProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:00'!
 hierarchyDelimiter: aHierarchyDelimiterString
 
-	hierarchyDelimiter := aHierarchyDelimiterString! !
+	hierarchyDelimiter _ aHierarchyDelimiterString! !
 
-!ICProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:07'!
+!ImapProtocolFolder methodsFor: 'accessing' stamp: 'pm 7/12/2019 18:07'!
 pathAsArray
 
 	^ self folderPath subStrings: self hierarchyDelimiter! !
 
-!ICProtocolFolder class methodsFor: 'instance creation' stamp: 'pm 7/12/2019 18:06'!
+!ImapProtocolFolder class methodsFor: 'instance creation' stamp: 'pm 7/12/2019 18:06'!
 newWithPath: aFolderPathString delimitedBy: aHierarchyDelimiterString
 
 	^ self new
 		folderPath: aFolderPathString;
 		hierarchyDelimiter: aHierarchyDelimiterString! !
 
-!ICStreamWrapper methodsFor: 'connection' stamp: 'js 6/14/2016 10:43'!
+!ImapStreamer methodsFor: 'connection' stamp: 'js 6/14/2016 10:43'!
 close
 	
 	self stream close! !
 
-!ICStreamWrapper methodsFor: 'connection' stamp: 'LW 8/1/2020 10:24'!
+!ImapStreamer methodsFor: 'connection' stamp: 'LW 8/1/2020 10:24'!
 connectTo: aHost on: aPort
 
 	| hostAddress |
 	
 	self ssl ifTrue: [^ self sslConnectTo: aHost on: aPort].
 	
-	hostAddress := NetNameResolver addressForName: aHost.
+	hostAddress _ NetNameResolver addressForName: aHost.
 	self close.
 	self stream: (SocketStream openConnectionToHost: hostAddress port: aPort)! !
 
-!ICStreamWrapper methodsFor: 'connection' stamp: 'LW 8/1/2020 10:24'!
+!ImapStreamer methodsFor: 'connection' stamp: 'LW 8/1/2020 10:24'!
 connectTo: aHost on: aPort with: aStreamClass
 
 	| hostAddress |
 	
 	self ssl ifTrue: [^ self sslConnectTo: aHost on: aPort].
 		
-	hostAddress := NetNameResolver addressForName: aHost.
+	hostAddress _ NetNameResolver addressForName: aHost.
 	self close.	
 	self stream: (aStreamClass openConnectionToHost: hostAddress port: aPort)! !
 
-!ICStreamWrapper methodsFor: 'connection' stamp: 'tg 7/26/2019 21:57'!
+!ImapStreamer methodsFor: 'connection' stamp: 'tg 7/26/2019 21:57'!
 sendCommand: aString
 
 	self stream sendCommand: aString! !
 
-!ICStreamWrapper methodsFor: 'connection' stamp: 'tg 7/26/2019 22:13'!
+!ImapStreamer methodsFor: 'connection' stamp: 'tg 7/26/2019 22:13'!
 sslConnectTo: aHost on: aPort
 
 	| hostAddress |
 	
-	hostAddress := NetNameResolver addressForName: aHost.
+	hostAddress _ NetNameResolver addressForName: aHost.
 	self stream: (SecureSocketStream openConnectionToHost: hostAddress port: aPort timeout: self class connectionTimeout).
 	self stream sslConnectTo: aHost! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'js 6/7/2016 09:58'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'js 6/7/2016 09:58'!
 host
 
 	^ host! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'js 6/7/2016 09:59'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'js 6/7/2016 09:59'!
 host: aString
 
-	host := aString! !
+	host _ aString! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'js 6/7/2016 10:04'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'js 6/7/2016 10:04'!
 isConnected
 
 	^ self stream isConnected! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'js 6/7/2016 10:08'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'js 6/7/2016 10:08'!
 lastResponse
 
 	^ lastResponse! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'ok 7/26/2019 21:15'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'ok 7/26/2019 21:15'!
 lastResponse: anOrderedCollection
 
-	lastResponse := anOrderedCollection! !
+	lastResponse _ anOrderedCollection! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 14:09'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'C.G. 7/25/2018 14:09'!
 nextResponse
 
 	self lastResponse: self stream nextLine.
 	
 	^ self lastResponse! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'js 6/7/2016 09:59'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'js 6/7/2016 09:59'!
 port
 
 	^ port! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:59'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'pm 6/9/2019 16:59'!
 port: aNumber
 
-	port := aNumber! !
+	port _ aNumber! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:14'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:14'!
 ssl
 
-	^ ssl ifNil: [ssl := false]! !
+	^ ssl ifNil: [ssl _ false]! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'ms 7/12/2016 09:45'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'ms 7/12/2016 09:45'!
 ssl: aBool
 
-	ssl := aBool! !
+	ssl _ aBool! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'pm 6/9/2019 13:14'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'jpb 5/28/2021 19:16:54'!
 stream
 
-	^ stream ifNil: [stream := ICNullStream new]! !
+	^ stream ifNil: [stream _ ImapNullStream new]! !
 
-!ICStreamWrapper methodsFor: 'accessing' stamp: 'js 6/7/2016 10:05'!
+!ImapStreamer methodsFor: 'accessing' stamp: 'js 6/7/2016 10:05'!
 stream: aStream
 
-	stream := aStream! !
+	stream _ aStream! !
 
-!ICStreamWrapper class methodsFor: 'constants' stamp: 'ok 7/26/2019 18:50'!
+!ImapStreamer class methodsFor: 'constants' stamp: 'ok 7/26/2019 18:50'!
 connectionTimeout
 
 	^ 10! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:58'!
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 3/8/2002 11:35'!
+connectionInfo
+	connectInfo ifNil: [connectInfo _ Dictionary new].
+	^connectInfo! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 2/25/2002 19:34'!
+defaultPortNumber
+	^self class defaultPortNumber! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 11/14/2002 18:29'!
+ensureConnection
+	self isConnected
+		ifTrue: [^self].
+	self stream
+		ifNotNil: [self stream close].
+
+	self stream: (SocketStream openConnectionToHost: self host port: self port).
+	self checkResponse.
+	self login! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 3/7/2002 13:35'!
+lastResponse
+	^lastResponse! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 3/7/2002 13:35'!
+lastResponse: aString
+	lastResponse _ aString.
+! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 2/25/2002 19:07'!
+logFlag
+	^self class logFlag! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 5/12/2003 18:10'!
+logProgress: aString
+	self progressObservers do: [:each | each show: aString].
+! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 3/8/2002 11:40'!
+openOnHost: hostIP port: portNumber
+	self host: hostIP.
+	self port: portNumber.
+	self ensureConnection! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'pre 5/8/2017 14:48'!
+parseCapabilities: lines
+
+	self serverCapabilities addAll: (lines select: [:l | l notEmpty] 
+			thenCollect: [:l | | tokens capability values |
+				tokens _ l findTokens: String space.
+				capability _ tokens first asSymbol.
+				values _ tokens allButFirst
+					ifEmpty: [true]
+					ifNotEmpty: [:rawValues | rawValues collect: [:v | 
+						v isAllDigits
+							ifTrue: [v asNumber]
+							ifFalse: [v asSymbol]]].
+				capability -> values])! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 7/23/2003 16:45'!
+pendingResponses
+	pendingResponses ifNil: [pendingResponses _ OrderedCollection new].
+	^pendingResponses! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 7/23/2003 16:55'!
+popResponse
+	| pendingResponse |
+	pendingResponse _ self pendingResponses removeFirst.
+	pendingResponses isEmpty
+		ifTrue: [pendingResponses _ nil].
+	^pendingResponse! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 3/7/2002 14:54'!
+progressObservers
+	progressObservers ifNil: [progressObservers _ OrderedCollection new].
+	^progressObservers! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 7/23/2003 16:45'!
+pushResponse: aResponse
+	self pendingResponses add: aResponse! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'mir 3/8/2002 11:35'!
+resetConnectionInfo
+	connectInfo _ nil! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'pre 5/8/2017 14:06'!
+serverCapabilities
+	serverCapabilities ifNil: [serverCapabilities _ Dictionary new].
+	^serverCapabilities! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'kph 9/23/2008 00:33'!
+standardTimeout
+
+	^ Socket standardTimeout! !
+
+!MailProtocolClient methodsFor: 'private' stamp: 'pre 5/8/2017 14:45'!
+starttlsVerb
+
+	^ #STARTTLS! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 4/7/2003 16:56'!
+host
+	^self connectionInfo at: #host! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 3/8/2002 11:37'!
+host: hostId
+	^self connectionInfo at: #host put: hostId! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'pre 5/4/2017 17:44'!
+hostName
+
+	^ self connectionInfo at: #hostName ifAbsent: [NetNameResolver nameForAddress: self host]! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'pre 5/4/2017 17:44'!
+hostName: aString
+
+	^ self connectionInfo at: #hostName put: aString! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 3/7/2002 14:55'!
+logProgressToTranscript
+	self progressObservers add: Transcript! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 5/9/2003 15:52'!
+messageText
+	^super messageText
+		ifNil: [self response]! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 4/7/2003 16:56'!
+password
+	^self connectionInfo at: #password! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 3/8/2002 11:37'!
+password: aString
+	^self connectionInfo at: #password put: aString! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 4/7/2003 16:57'!
+port
+	^self connectionInfo at: #port! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 3/8/2002 11:38'!
+port: aPortNumber
+	^self connectionInfo at: #port put: aPortNumber! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 5/9/2003 15:52'!
+response
+	^self protocolInstance lastResponse! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 2/22/2002 17:33'!
+stream
+	^stream! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 2/22/2002 17:33'!
+stream: aStream
+	stream _ aStream! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 11/11/2002 16:19'!
+user
+	^self connectionInfo at: #user ifAbsent: [nil]! !
+
+!MailProtocolClient methodsFor: 'accessing' stamp: 'mir 3/8/2002 11:39'!
+user: aString
+	^self connectionInfo at: #user put: aString! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:50:37'!
+checkForPendingError
+	"If data is waiting, check it to catch any error reports.
+	In case the response is not an error, push it back."
+
+	self stream isDataAvailable
+		ifFalse: [^self].
+	self fetchNextResponse.
+	self
+		checkResponse: self lastResponse
+		onError: [:response | (MailProtocolError protocolInstance: self) signal]
+		onWarning: [:response | (MailProtocolError protocolInstance: self) signal].
+	"if we get here, it wasn't an error"
+	self pushResponse: self lastResponse! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:50:12'!
+checkResponse
+	"Get the response from the server and check for errors."
+
+	self
+		checkResponseOnError: [:response | (MailProtocolError protocolInstance: self) signal]
+		onWarning: [:response | (MailProtocolError protocolInstance: self) signal].
+! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'mir 7/23/2003 16:51'!
+checkResponse: aResponse onError: errorBlock onWarning: warningBlock
+	"Get the response from the server and check for errors. Invoke one of the blocks if an error or warning is encountered. See class comment for classification of error codes."
+
+	self responseIsError
+		ifTrue: [errorBlock value: aResponse].
+	self responseIsWarning
+		ifTrue: [warningBlock value: aResponse].
+! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'mir 7/23/2003 16:54'!
+checkResponseOnError: errorBlock onWarning: warningBlock
+	"Get the response from the server and check for errors. Invoke one of the blocks if an error or warning is encountered. See class comment for classification of error codes."
+
+	self fetchPendingResponse.
+	self checkResponse: self lastResponse onError: errorBlock onWarning: warningBlock! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'mir 3/7/2002 13:16'!
+fetchNextResponse
+	self lastResponse: self stream nextLine! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'mir 7/23/2003 16:50'!
+fetchPendingResponse
+	^pendingResponses
+		ifNil: [self fetchNextResponse; lastResponse]
+		ifNotNil: [self popResponse]! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'pre 5/8/2017 14:50'!
+responseIsSuccess
+
+	^ self responseCode = 220! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'mir 5/12/2003 18:10'!
+sendCommand: aString
+	self stream sendCommand: aString.
+! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'mir 3/5/2002 14:31'!
+sendStreamContents: aStream
+	self stream sendStreamContents: aStream! !
+
+!MailProtocolClient methodsFor: 'private protocol' stamp: 'pre 5/11/2017 16:49'!
+starttls
+	Smalltalk at: #SqueakSSL ifAbsent:[self error: 'SqueakSSL is missing'].
+	
+	self sendCommand: self starttlsVerb.
+	self checkResponse.
+	self responseIsSuccess ifTrue: [
+		stream _ SqueakSSL secureSocketStream on: stream socket.
+		stream sslConnectTo: self hostName.
+		self connectionInfo at: #tlsActive put: true].! !
+
+!MailProtocolClient methodsFor: 'private testing' stamp: 'mir 3/7/2002 13:42'!
+responseIsError
+	self subclassResponsibility! !
+
+!MailProtocolClient methodsFor: 'private testing' stamp: 'mir 3/7/2002 13:42'!
+responseIsWarning
+	self subclassResponsibility! !
+
+!MailProtocolClient methodsFor: 'private testing' stamp: 'pre 5/8/2017 15:03'!
+wantsStarttls
+
+	^ self serverSupportsStarttls! !
+
+!MailProtocolClient methodsFor: 'actions' stamp: 'mir 3/7/2002 13:10'!
+close
+	self stream
+		ifNotNil: [
+			self stream close.
+			stream _ nil]! !
+
+!MailProtocolClient methodsFor: 'actions' stamp: 'mir 3/7/2002 13:11'!
+reopen
+	self ensureConnection! !
+
+!MailProtocolClient methodsFor: 'testing' stamp: 'mir 3/7/2002 14:33'!
+isConnected
+	^stream notNil
+		and: [stream isConnected]! !
+
+!MailProtocolClient methodsFor: 'testing' stamp: 'pre 5/8/2017 14:45'!
+serverSupportsStarttls
+
+	^ self serverCapabilities at: self starttlsVerb ifAbsent: [false]! !
+
+!MailProtocolClient methodsFor: 'testing' stamp: 'pre 5/11/2017 16:49'!
+tlsIsActive
+
+	^ self connectionInfo at: #tlsActive ifAbsent: [false]! !
+
+!MailProtocolClient class methodsFor: 'instance creation' stamp: 'mir 2/25/2002 15:59'!
+openOnHost: hostIP port: portNumber
+	^self new openOnHost: hostIP port: portNumber! !
+
+!MailProtocolClient class methodsFor: 'instance creation' stamp: 'gk 3/2/2004 11:10'!
+openOnHostNamed: hostName
+	"If the hostname uses the colon syntax to express a certain portnumber
+	we use that instead of the default port number."
+
+	| i |
+	i _ hostName indexOf: $:.
+	i = 0 ifTrue: [
+			^self openOnHostNamed: hostName port: self defaultPortNumber]
+		ifFalse: [
+			| s p | 
+			s _ hostName truncateTo: i - 1.
+			p _ (hostName copyFrom: i + 1 to: hostName size) asInteger.
+			^self openOnHostNamed: s port: p]
+	! !
+
+!MailProtocolClient class methodsFor: 'instance creation' stamp: 'pre 5/4/2017 17:45'!
+openOnHostNamed: hostName port: portNumber
+	| serverIP |
+	serverIP _ NetNameResolver addressForName: hostName timeout: 20.
+	^ (self openOnHost: serverIP port: portNumber)
+		hostName: hostName;
+		yourself
+! !
+
+!MailProtocolClient class methodsFor: 'accessing' stamp: 'mir 2/25/2002 16:00'!
+defaultPortNumber
+	self subclassResponsibility! !
+
+!MailProtocolClient class methodsFor: 'accessing' stamp: 'mir 2/25/2002 19:07'!
+logFlag
+	self subclassResponsibility! !
+
+!MailPop3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:58'!
 apopLoginUser: userName password: password
 
 	self loginUser: userName password: password loginMethod: #APOP! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:35'!
+!MailPop3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:35'!
 deleteMessage: num
 	"delete the numbered message"
 
@@ -2412,12 +2794,12 @@ deleteMessage: num
 	self checkResponse.
 	self logProgress: self lastResponse! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:57'!
+!MailPop3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:57'!
 loginUser: userName password: password
 
 	self loginUser: userName password: password loginMethod: #clearText! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'mir 3/8/2002 11:40'!
+!MailPop3Client methodsFor: 'public protocol' stamp: 'mir 3/8/2002 11:40'!
 loginUser: userName password: password loginMethod: aLoginMethod
 
 	self user: userName.
@@ -2425,7 +2807,7 @@ loginUser: userName password: password loginMethod: aLoginMethod
 	self loginMethod: aLoginMethod.
 	self login! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'nice 12/27/2009 04:19'!
+!MailPop3Client methodsFor: 'public protocol' stamp: 'nice 12/27/2009 04:19'!
 messageCount
 	"Query the server and answer the number of messages that are in the user's mailbox."
 
@@ -2436,20 +2818,20 @@ messageCount
 	self logProgress: self lastResponse.
 
 	[ | answerString |
-	answerString := (self lastResponse findTokens: Character separators) second.
-	numMessages := answerString asNumber asInteger]
+	answerString _ (self lastResponse findTokens: Character separators) second.
+	numMessages _ answerString asNumber asInteger]
 		on: Error
 		do: [:ex | (ProtocolClientError protocolInstance: self) signal: 'Invalid STAT response.'].
 	^numMessages! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'len 12/14/2002 17:50'!
+!MailPop3Client methodsFor: 'public protocol' stamp: 'len 12/14/2002 17:50'!
 quit
 	"QUIT <CRLF>"
 
 	self sendCommand: 'QUIT'.
 	self checkResponse.! !
 
-!POP3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:35'!
+!MailPop3Client methodsFor: 'public protocol' stamp: 'mir 3/7/2002 14:35'!
 retrieveMessage: number
 	"retrieve the numbered message"
 
@@ -2460,25 +2842,25 @@ retrieveMessage: number
 
 	^self getMultilineResponse! !
 
-!POP3Client methodsFor: 'private' stamp: 'mir 11/11/2002 16:20'!
+!MailPop3Client methodsFor: 'private' stamp: 'mir 11/11/2002 16:20'!
 loginMethod
 	^self connectionInfo at: #loginMethod ifAbsent: [nil]! !
 
-!POP3Client methodsFor: 'private' stamp: 'mir 3/8/2002 11:41'!
+!MailPop3Client methodsFor: 'private' stamp: 'mir 3/8/2002 11:41'!
 loginMethod: aSymbol
 	^self connectionInfo at: #loginMethod put: aSymbol! !
 
-!POP3Client methodsFor: 'private' stamp: 'pre 5/8/2017 14:46'!
+!MailPop3Client methodsFor: 'private' stamp: 'pre 5/8/2017 14:46'!
 starttlsVerb
 
 	^ #STLS! !
 
-!POP3Client methodsFor: 'private' stamp: 'pre 5/8/2017 14:45'!
+!MailPop3Client methodsFor: 'private' stamp: 'pre 5/8/2017 14:45'!
 wantsStarttls
 
 	^ true! !
 
-!POP3Client methodsFor: 'private protocol' stamp: 'nice 12/27/2009 03:11'!
+!MailPop3Client methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:52:30'!
 apopLogin
 
 	"Attempt to authenticate ourselves to the server without sending the password as cleartext."
@@ -2495,26 +2877,26 @@ and then send only the MD5 hash of that to the server.  Thus the password never 
 
 	[ | timestamp hash |
 	"Look for a timestamp in the response we received from the server"
-	timestamp := self lastResponse findTokens: '<>' includes: '@'.
+	timestamp _ self lastResponse findTokens: '<>' includes: '@'.
 	timestamp
-		ifNil: [(POP3LoginError protocolInstance: self) signal: 'APOP not supported.'].
+		ifNil: [(MailPop3LoginError protocolInstance: self) signal: 'APOP not supported.'].
 
 	(Smalltalk includesKey: #MD5)
 		ifTrue: [
-			hash := ((Smalltalk at: #MD5) hashMessage: ('<', timestamp, '>', self password)) storeStringHex asLowercase.
+			hash _ ((Smalltalk at: #MD5) hashMessage: ('<', timestamp, '>', self password)) storeStringHex asLowercase.
 			"trim starting 16r and zero pad it to 32 characters if needed"
-			hash := hash  padded: #left to: 32 with: $0]
-		ifFalse: [(POP3LoginError protocolInstance: self) signal: 'APOP (MD5) not supported.'].
+			hash _ hash  padded: #left to: 32 with: $0]
+		ifFalse: [(MailPop3LoginError protocolInstance: self) signal: 'APOP (MD5) not supported.'].
 
 	self sendCommand: 'APOP ', self user, ' ', hash.
 	self checkResponse.
 	self logProgress: self lastResponse]
-		on: ProtocolClientError
+		on: MailClientError
 		do: [:ex |
 			self close.
-			(LoginFailedException protocolInstance: self) signal: 'Login failed.']! !
+			(MailLoginFailedError protocolInstance: self) signal: 'Login failed.']! !
 
-!POP3Client methodsFor: 'private protocol' stamp: 'mir 4/7/2003 17:38'!
+!MailPop3Client methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:53:30'!
 clearTextLogin
 
 	[self sendCommand: 'USER ', self user.
@@ -2524,30 +2906,30 @@ clearTextLogin
 	self sendCommand: 'PASS ', self password.
 	self checkResponse.
 	self logProgress: self lastResponse]
-		on: TelnetProtocolError
+		on: MailProtocolError
 		do: [:ex |
 			"Neither authentication worked.  Indicate an error and close up"
 			self close.
-			ex resignalAs: ((LoginFailedException protocolInstance: self) signal: 'Login failed.')]! !
+			ex resignalAs: ((MailLoginFailedError protocolInstance: self) signal: 'Login failed.')]! !
 
-!POP3Client methodsFor: 'private protocol' stamp: 'mir 11/14/2002 17:40'!
+!MailPop3Client methodsFor: 'private protocol' stamp: 'mir 11/14/2002 17:40'!
 getMultilineResponse
 	"Get a multiple line response to the last command, filtering out LF characters. A multiple line response ends with a line containing only a single period (.) character."
 
 	| response done chunk |
-	response := WriteStream on: ''.
-	done := false.
+	response _ WriteStream on: ''.
+	done _ false.
 	[done] whileFalse: [
-		chunk := self stream nextLine.
+		chunk _ self stream nextLine.
 		(chunk beginsWith: '.')
 			ifTrue: [response nextPutAll: (chunk copyFrom: 2 to: chunk size); cr ]
 			ifFalse: [response nextPutAll: chunk; cr ].
-		done := (chunk = '.') ].
+		done _ (chunk = '.') ].
 
 	^ response contents
 ! !
 
-!POP3Client methodsFor: 'private protocol' stamp: 'pre 5/11/2017 16:49'!
+!MailPop3Client methodsFor: 'private protocol' stamp: 'pre 5/11/2017 16:49'!
 initiateSession
 
 	self sendCommand: 'CAPA'.
@@ -2558,7 +2940,7 @@ initiateSession
 	(self tlsIsActive not and: [self serverSupportsStarttls] and: [self wantsStarttls])
 		ifTrue: [self starttls]! !
 
-!POP3Client methodsFor: 'private protocol' stamp: 'pre 5/8/2017 14:39'!
+!MailPop3Client methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:53:41'!
 login
 
 	self initiateSession.
@@ -2568,87 +2950,71 @@ login
 		ifTrue: [^self clearTextLogin].
 	self loginMethod == #APOP
 		ifTrue: [^self apopLogin].
-	(POP3LoginError protocolInstance: self) signal: 'Unsupported login procedure.'! !
+	(MailPop3LoginError protocolInstance: self) signal: 'Unsupported login procedure.'! !
 
-!POP3Client methodsFor: 'private testing' stamp: 'mir 3/7/2002 13:43'!
+!MailPop3Client methodsFor: 'private testing' stamp: 'mir 3/7/2002 13:43'!
 responseIsError
 	^self lastResponse beginsWith: '-'! !
 
-!POP3Client methodsFor: 'private testing' stamp: 'pre 5/8/2017 14:50'!
+!MailPop3Client methodsFor: 'private testing' stamp: 'pre 5/8/2017 14:50'!
 responseIsSuccess
 	^self lastResponse beginsWith: '+'! !
 
-!POP3Client methodsFor: 'private testing' stamp: 'mir 11/11/2002 15:44'!
+!MailPop3Client methodsFor: 'private testing' stamp: 'mir 11/11/2002 15:44'!
 responseIsWarning
 	^self lastResponse beginsWith: '-'! !
 
-!POP3Client class methodsFor: 'example' stamp: 'rbb 3/1/2005 11:05'!
+!MailPop3Client class methodsFor: 'example' stamp: 'jpb 5/28/2021 19:23:57'!
 example
 	"POP3Client example"
 	"download a user's messages into an OrderedCollection and inspect the OrderedCollection"
 
 	| ps messages userName password |
-	userName := (UIManager default request: 'POP username').
-	password := (UIManager default request: 'POP password').
-	ps := POP3Client openOnHostNamed: (UIManager default request: 'POP server').
+	userName _ (UIManager default request: 'POP username').
+	password _ (UIManager default request: 'POP password').
+	ps _ MailPop3Client openOnHostNamed: (UIManager default request: 'POP server').
 	[
 	ps loginUser: userName password: password.
 	ps logProgressToTranscript.
 
-	messages := OrderedCollection new.
+	messages _ OrderedCollection new.
 	1 to: ps messageCount do: [ :messageNr |
 		messages add: (ps retrieveMessage: messageNr) ]]
 		ensure: [ps close].
 
 	messages inspect.! !
 
-!POP3Client class methodsFor: 'accessing' stamp: 'mir 3/7/2002 12:51'!
+!MailPop3Client class methodsFor: 'accessing' stamp: 'mir 3/7/2002 12:51'!
 defaultPortNumber
 	^110! !
 
-!POP3Client class methodsFor: 'accessing' stamp: 'mir 3/7/2002 12:52'!
+!MailPop3Client class methodsFor: 'accessing' stamp: 'mir 3/7/2002 12:52'!
 logFlag
 	^#pop! !
 
-!SMTPClient methodsFor: 'public protocol' stamp: 'ar 12/4/2009 10:06'!
-localHostName
-	"The local host name for purposes of identifying the the server.
-	If nil, NetNameResolver localHostName will be used."
+!MailSmtpClient methodsFor: 'accessing' stamp: 'mir 2/22/2002 17:33'!
+responseCode
+	^responseCode! !
 
-	^self connectionInfo at: #localHostName ifAbsent: [NetNameResolver localHostName]! !
+!MailSmtpClient methodsFor: 'private' stamp: 'mir 2/22/2002 17:34'!
+determineResponseCode
+	self lastResponse size >= 3
+		ifFalse: [^0].
+	^[SmallInteger readFromString: (self lastResponse copyFrom: 1 to: 3)]
+		on: Error
+		do: [:ex | ex return: 0]! !
 
-!SMTPClient methodsFor: 'public protocol' stamp: 'ar 12/4/2009 10:06'!
-localHostName: aString
-	"The local host name for purposes of identifying the the server.
-	If nil, NetNameResolver localHostName will be used."
+!MailSmtpClient methodsFor: 'private' stamp: 'mir 11/14/2002 18:27'!
+lastResponse: aString
+	super lastResponse: aString.
+	responseCode _ self determineResponseCode! !
 
-	^self connectionInfo at: #localHostName put: aString! !
+!MailSmtpClient methodsFor: 'private' stamp: 'pre 5/8/2017 14:15'!
+valueOfResponseLine: aString
 
-!SMTPClient methodsFor: 'public protocol' stamp: 'mir 2/21/2002 15:43'!
-mailFrom: sender to: recipientList text: messageText
-	"deliver this mail to a list of users.  NOTE: the recipient list should be a collection of simple internet style addresses -- no '<>' or '()' stuff"
+	^ aString allButFirst: 4 ! !
 
-	self mailFrom: sender.
-	recipientList do: [ :recipient |
-		self recipient: recipient ].
-	self data: messageText.
-! !
-
-!SMTPClient methodsFor: 'public protocol' stamp: 'gk 8/4/2006 15:14'!
-useHelo
-	"If client use HELO instead of EHLO. HELO is the old protocol and
-	an old server may require it instead of EHLO."
-
-	^self connectionInfo at: #useHelo ifAbsent: [false]! !
-
-!SMTPClient methodsFor: 'public protocol' stamp: 'gk 8/4/2006 15:14'!
-useHelo: aBoolean
-	"Tell client to use HELO instead of EHLO. HELO is the old protocol and
-	an old server may require it instead of EHLO."
-
-	^self connectionInfo at: #useHelo put: aBoolean! !
-
-!SMTPClient methodsFor: 'private protocol' stamp: 'pre 5/4/2017 15:35'!
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:44:26'!
 data: messageData
 	"send the data of a message"
 	"DATA <CRLF>"
@@ -2659,17 +3025,37 @@ data: messageData
 
 	"process the data one line at a time"
 	messageData linesDo:  [ :messageLine | | cookedLine |
-		cookedLine := messageLine.
+		cookedLine _ messageLine.
 		(cookedLine beginsWith: '.') ifTrue: [ 
 			"lines beginning with a dot must have the dot doubled"
-			cookedLine := '.', cookedLine ].
+			cookedLine _ '.', cookedLine ].
 		self sendCommand: cookedLine ].
 
 	"inform the server the entire message text has arrived"
 	self sendCommand: '.'.
 	self checkResponse.! !
 
-!SMTPClient methodsFor: 'private protocol' stamp: 'klub 1/3/2018 20:36'!
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'pre 5/8/2017 13:43'!
+fetchNextResponse
+	"The FTP and similar protocols allow multi-line responses.
+	If the response is multi-line, the fourth character of the first line is a  
+	$- and the last line repeats the numeric code but the code is followed by 
+	a space."
+
+	| response result firstLine |
+	result _ '' writeStream.
+	firstLine _ self stream nextLine.
+	result nextPutAll: firstLine.
+	(self responseIsContinuation: firstLine) ifTrue: 
+		["continued over multiple lines. Discard continuation lines."
+			[response _ self stream nextLine.
+			response ifNil: [^nil].
+			self response: response indicatesEndOf: firstLine.] 
+					whileFalse: [result cr; nextPutAll: response].
+			result cr; nextPutAll: response].
+	self lastResponse: result contents! !
+
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:44:20'!
 initiateSession
 	"EHLO <SP> <domain> <CRLF>"
 
@@ -2685,29 +3071,48 @@ initiateSession
 			self responseIsSuccess ifTrue: [
 				self initiateSession ] ]! !
 
-!SMTPClient methodsFor: 'private protocol' stamp: 'ar 2/10/2010 15:32'!
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:51:12'!
 login
 	"Send HELO first"
 	self initiateSession.
 	self user ifNil: [^self].
 	self sendCommand: 'AUTH LOGIN ' , (self encodeString: self user).
 	[self checkResponse]
-		on: TelnetProtocolError
+		on: MailProtocolError 
 		do: [ :ex | ex isCommandUnrecognized ifTrue: [^ self] ifFalse: [ex pass]].
 	self sendCommand: (self encodeString: self password).
 	self checkResponse! !
 
-!SMTPClient methodsFor: 'private protocol' stamp: 'fbs 3/23/2004 17:16'!
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:51:03'!
+lookForCode: code
+	"We are expecting a certain code next."
+
+	self
+		lookForCode: code
+		ifDifferent: [:response | (MailProtocolError protocolInstance: self) signal: response]
+! !
+
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'mir 11/14/2002 16:21'!
+lookForCode: code ifDifferent: handleBlock
+	"We are expecting a certain code next."
+
+	self fetchNextResponse.
+
+	self responseCode == code
+		ifFalse: [handleBlock value: self lastResponse]
+! !
+
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:44:07'!
 mailFrom: fromAddress
 	" MAIL <SP> FROM:<reverse-path> <CRLF>"
 
 	| address |
-	address := (MailAddressParser addressesIn: fromAddress) first.
+	address _ (MailAddressParser addressesIn: fromAddress) first.
 
 	self sendCommand: 'MAIL FROM: <', address, '>'.
 	self checkResponse.! !
 
-!SMTPClient methodsFor: 'private protocol' stamp: 'mir 2/21/2002 17:52'!
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:44:01'!
 quit
 	"send a QUIT command.  This is polite to do, and indeed some servers might drop messages that don't have an associated QUIT"
 	"QUIT <CRLF>"
@@ -2715,7 +3120,7 @@ quit
 	self sendCommand: 'QUIT'.
 	self checkResponse.! !
 
-!SMTPClient methodsFor: 'private protocol' stamp: 'mir 2/21/2002 17:52'!
+!MailSmtpClient methodsFor: 'private protocol' stamp: 'jpb 5/28/2021 19:43:58'!
 recipient: aRecipient
 	"specify a recipient for the message.  aRecipient should be a bare email address"
 	"RCPT <SP> TO:<forward-path> <CRLF>"
@@ -2723,19 +3128,100 @@ recipient: aRecipient
 	self sendCommand: 'RCPT TO: <', aRecipient, '>'.
 	self checkResponse.! !
 
-!SMTPClient methodsFor: 'utility' stamp: 'ar 12/4/2009 10:08'!
+!MailSmtpClient methodsFor: 'private testing' stamp: 'pre 5/8/2017 13:42'!
+response: response indicatesEndOf: aLine
+
+	^ response size > 3 
+		and: [(response copyFrom: 1 to: 3) = (aLine copyFrom: 1 to: 3) 
+		and: [(response at: 4) = Character space]]! !
+
+!MailSmtpClient methodsFor: 'private testing' stamp: 'pre 5/8/2017 14:13'!
+responseIsContinuation: response
+	^ response size > 3 and: [(response at: 4) == $-]! !
+
+!MailSmtpClient methodsFor: 'private testing' stamp: 'mir 2/22/2002 17:35'!
+responseIsError
+	^self responseCode between: 500 and: 599! !
+
+!MailSmtpClient methodsFor: 'private testing' stamp: 'pre 5/8/2017 14:50'!
+responseIsSuccess
+	^self responseCode between: 200 and: 299! !
+
+!MailSmtpClient methodsFor: 'private testing' stamp: 'mir 2/22/2002 17:35'!
+responseIsWarning
+	^self responseCode between: 400 and: 499! !
+
+!MailSmtpClient methodsFor: 'public protocol' stamp: 'jpb 5/28/2021 19:44:17'!
+localHostName
+	"The local host name for purposes of identifying the the server.
+	If nil, NetNameResolver localHostName will be used."
+
+	^self connectionInfo at: #localHostName ifAbsent: [NetNameResolver localHostName]! !
+
+!MailSmtpClient methodsFor: 'public protocol' stamp: 'jpb 5/28/2021 19:44:13'!
+localHostName: aString
+	"The local host name for purposes of identifying the the server.
+	If nil, NetNameResolver localHostName will be used."
+
+	^self connectionInfo at: #localHostName put: aString! !
+
+!MailSmtpClient methodsFor: 'public protocol' stamp: 'jpb 5/28/2021 19:44:04'!
+mailFrom: sender to: recipientList text: messageText
+	"deliver this mail to a list of users.  NOTE: the recipient list should be a collection of simple internet style addresses -- no '<>' or '()' stuff"
+
+	self mailFrom: sender.
+	recipientList do: [ :recipient |
+		self recipient: recipient ].
+	self data: messageText.
+! !
+
+!MailSmtpClient methodsFor: 'public protocol' stamp: 'jpb 5/28/2021 19:43:55'!
+useHelo
+	"If client use HELO instead of EHLO. HELO is the old protocol and
+	an old server may require it instead of EHLO."
+
+	^self connectionInfo at: #useHelo ifAbsent: [false]! !
+
+!MailSmtpClient methodsFor: 'public protocol' stamp: 'jpb 5/28/2021 19:43:51'!
+useHelo: aBoolean
+	"Tell client to use HELO instead of EHLO. HELO is the old protocol and
+	an old server may require it instead of EHLO."
+
+	^self connectionInfo at: #useHelo put: aBoolean! !
+
+!MailSmtpClient methodsFor: 'utility' stamp: 'jpb 5/28/2021 19:44:23'!
 encodeString: aString 
 	| str dec out |
-	str := String new: (aString size * 4 / 3 + 3) ceiling.
-	dec := Base64MimeConverter new.
+	str _ String new: (aString size * 4 / 3 + 3) ceiling.
+	dec _ Base64MimeConverter new.
 	dec
-		mimeStream: (out := WriteStream on: str);
+		mimeStream: (out _ WriteStream on: str);
 		dataStream: (ReadStream on: aString);
 		multiLine: false;
 		mimeEncode.
 	^out contents! !
 
-!SMTPClient class methodsFor: 'example' stamp: 'mir 2/22/2002 16:41'!
+!MailSmtpClient class methodsFor: 'accessing' stamp: 'jpb 5/28/2021 19:43:29'!
+defaultPortNumber
+	^25! !
+
+!MailSmtpClient class methodsFor: 'accessing' stamp: 'jpb 5/28/2021 19:43:14'!
+logFlag
+	^#smtp! !
+
+!MailSmtpClient class methodsFor: 'accessing' stamp: 'mir 2/21/2002 17:21'!
+rawResponseCodes
+	self subclassResponsibility! !
+
+!MailSmtpClient class methodsFor: 'instance creation' stamp: 'jpb 5/28/2021 19:43:07'!
+openOnHost: hostIP port: portNumber
+
+	| client |
+	client _ super openOnHost: hostIP port: portNumber.
+	client initiateSession.
+	^client! !
+
+!MailSmtpClient class methodsFor: 'example' stamp: 'jpb 5/28/2021 19:43:22'!
 example
 	"SMTPClient example"
 
@@ -2747,7 +3233,7 @@ Subject: this is a test
 Hello from Squeak!!
 '	usingServer: 'smtp.concentric.net'! !
 
-!SMTPClient class methodsFor: 'example' stamp: 'mir 2/22/2002 16:43'!
+!MailSmtpClient class methodsFor: 'example' stamp: 'jpb 5/28/2021 19:43:19'!
 example2
 	"SMTPClient example2"
 
@@ -2757,28 +3243,12 @@ example2
 Hello from Squeak!!
 '	usingServer: 'smtp.concentric.net'! !
 
-!SMTPClient class methodsFor: 'accessing' stamp: 'mir 2/21/2002 17:22'!
-defaultPortNumber
-	^25! !
-
-!SMTPClient class methodsFor: 'accessing' stamp: 'mir 2/25/2002 19:07'!
-logFlag
-	^#smtp! !
-
-!SMTPClient class methodsFor: 'instance creation' stamp: 'mir 2/22/2002 17:37'!
-openOnHost: hostIP port: portNumber
-
-	| client |
-	client := super openOnHost: hostIP port: portNumber.
-	client initiateSession.
-	^client! !
-
-!SMTPClient class methodsFor: 'sending mail' stamp: 'mir 2/22/2002 12:30'!
+!MailSmtpClient class methodsFor: 'sending mail' stamp: 'jpb 5/28/2021 19:43:26'!
 deliverMailFrom: fromAddress to: recipientList text: messageText usingServer: serverName
 	"Deliver a single email to a list of users and then close the connection.  For delivering multiple messages, it is best to create a single connection and send all mail over it.  NOTE: the recipient list should be a collection of simple internet style addresses -- no '<>' or '()' stuff"
 
 	| smtpClient |
-	smtpClient := self openOnHostNamed: serverName.
+	smtpClient _ self openOnHostNamed: serverName.
 	[smtpClient mailFrom: fromAddress to: recipientList text: messageText.
 	smtpClient quit]
 		ensure: [smtpClient close]
