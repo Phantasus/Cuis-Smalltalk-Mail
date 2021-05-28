@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 9:46:15 am'!
+'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 8:19:18 pm'!
 'Description Author: Josef Philip Bernhart
 License: MIT
 
 Copyright 2021 Josef Philip Bernhart
 '!
-!provides: 'Mail-Morphs' 1 4!
+!provides: 'Mail-Morphs' 1 5!
 SystemOrganization addCategory: 'Mail-Morphs'!
 
 
@@ -22,6 +22,18 @@ MailBrowserWindow class
 !MailBrowserWindow commentStamp: '<historical>' prior: 0!
 Represents a window for editing and sending mail. It's intention is to test functionality, not to be a full mail client.!
 
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 19:48:55'!
+buildChangeShowButton 
+	| button |
+	button _ PluggableButtonMorph 
+		model: self
+		stateGetter: nil
+		action: #openShowOptionsMenu.
+
+	button label: 'Show'.
+	button setBalloonText: 'Changes what to show'.
+	^button! !
+
 !MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:29:26'!
 buildForwardMailButton
 	| button |
@@ -34,7 +46,7 @@ buildForwardMailButton
 	button setBalloonText: 'Starts a new forward to the selected mail'.
 	^button! !
 
-!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 08:26:48'!
+!MailBrowserWindow methodsFor: 'GUI building' stamp: 'jpb 5/27/2021 19:47:53'!
 buildMailActionButtons
 	"Returns a layout morph which contains edit buttons"
 	| buttonsContainer |
@@ -44,6 +56,7 @@ buildMailActionButtons
 	buttonsContainer addMorph: self buildSendMailButton proportionalWidth: 10.
 	buttonsContainer addMorph: self buildReplyMailButton proportionalWidth: 10.
 	buttonsContainer addMorph: self buildForwardMailButton proportionalWidth: 10.
+	buttonsContainer addMorph: self buildChangeShowButton proportionalWidth: 10.
 		
 	^buttonsContainer! !
 
@@ -137,3 +150,15 @@ buildSendMailButton
 	button label: 'Send'.
 	button setBalloonText: 'Sends the currently edited mail'.
 	^button! !
+
+!MailBrowserWindow methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 19:59:28'!
+openShowOptionsMenu
+	| aMenu |
+	
+	aMenu _ MenuMorph new defaultTarget: model.
+	aMenu addTitle: 'What to show'.
+	aMenu addStayUpIcons.
+	aMenu addUpdating: #showRawToggleLabel target: model  action: #toggleShowRaw.
+	aMenu addUpdating: #showFormattedToggleLabel target: model  action: #toggleShowFormatted.
+	
+	aMenu popUpInWorld ! !

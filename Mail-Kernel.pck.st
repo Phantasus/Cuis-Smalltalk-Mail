@@ -1,9 +1,9 @@
-'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 6:51:28 pm'!
+'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 9:28:36 pm'!
 'Description Provides mail envelope reading and writing
 
 Author: Josef Philip Bernhart (jpb)
 License: MIT'!
-!provides: 'Mail-Kernel' 1 59!
+!provides: 'Mail-Kernel' 1 61!
 SystemOrganization addCategory: 'Mail-Kernel-Tests'!
 SystemOrganization addCategory: 'Mail-Kernel'!
 
@@ -140,7 +140,7 @@ MailAddressToken class
 
 !classDefinition: #MailBrowser category: 'Mail-Kernel'!
 Object subclass: #MailBrowser
-	instanceVariableNames: 'mailSelectionIndex mailRepository recordsList recordsListFetchedAt newMailMessage mailSender'
+	instanceVariableNames: 'mailSelectionIndex mailRepository recordsList recordsListFetchedAt newMailMessage mailSender mailRenderStyle'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Mail-Kernel'!
@@ -156,6 +156,16 @@ Object subclass: #MailMessage
 	category: 'Mail-Kernel'!
 !classDefinition: 'MailMessage class' category: 'Mail-Kernel'!
 MailMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #MailQuery category: 'Mail-Kernel'!
+Object subclass: #MailQuery
+	instanceVariableNames: 'recordLimit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Mail-Kernel'!
+!classDefinition: 'MailQuery class' category: 'Mail-Kernel'!
+MailQuery class
 	instanceVariableNames: ''!
 
 !classDefinition: #MailRecord category: 'Mail-Kernel'!
@@ -303,6 +313,9 @@ A model for browsing mail!
 
 !MailMessage commentStamp: '<historical>' prior: 0!
 I represent a Internet mail or news message as defined in RFC 5322, which does not include media types (MIME types), attachments, pictures or similiar additions!
+
+!MailQuery commentStamp: '<historical>' prior: 0!
+A query for mail used by mail repositories to limit the amount of mail to be considered.!
 
 !MailRecord commentStamp: '<historical>' prior: 0!
 Represents a record within a mail message repository, it knows how to read itself from the repository as it's supposed to be lazily loaded or eagerly loaded with it's full mail message content.
@@ -936,6 +949,34 @@ testWriteFullLine
 	streamer nextPut: lineText.
 	
 	self assert: lineText , String crlfString equals: content contents.! !
+
+!MailLineStreamerTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 21:08:56'!
+testWriteTooLongLineWithError
+	| streamer content lineText |
+	content _ '' writeStream.
+	streamer _ usedClass on: content.
+	
+	lineText _ '' join: ((1 to: 79) collect: [:x| 'X' ]).
+	
+	self should: [ 		streamer nextPut: lineText ]
+		raise:  Error
+		withExceptionDo: [:error | self assert: 'Error: Line too long: 79@1' equals: error description  ].
+! !
+
+!MailLineStreamerTest methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 21:25:01'!
+testWriteTooLongLineWithoutError
+	| streamer content lineText expected |
+	content _ '' writeStream.
+	streamer _ usedClass on: content.
+	streamer beTolerant.
+	
+	lineText _ '' join: ((1 to: 80) collect: [:x| 'X' ]).
+	expected _ '' join: ((1 to: 78) collect: [:x| 'X' ]).
+	expected _ expected , String crlfString , ' XX' , String crlfString. 
+	
+	streamer nextPut: lineText.
+	
+	self assert: expected equals: content contents.! !
 
 !MailMessageHeaderTest methodsFor: 'as yet unclassified' stamp: 'jpb 4/27/2021 16:31:00'!
 setUp
@@ -1572,6 +1613,32 @@ type: type0  text: text0
 type: type  text: text
 	^self new type: type text: text! !
 
+!MailBrowser methodsFor: 'show actions' stamp: 'jpb 5/27/2021 20:11:55'!
+showFormattedToggleLabel
+	mailRenderStyle = #formatted
+		ifTrue: [ ^ '<on> Show formatted' ]
+		ifFalse: [ ^'<off> Show formatted' ]! !
+
+!MailBrowser methodsFor: 'show actions' stamp: 'jpb 5/27/2021 20:10:33'!
+showRawToggleLabel
+	mailRenderStyle = #raw
+		ifTrue: [ ^ '<on> Show Raw envelope' ]
+		ifFalse: [ ^'<off> Show Raw envelope' ]! !
+
+!MailBrowser methodsFor: 'show actions' stamp: 'jpb 5/27/2021 20:13:48'!
+toggleShowFormatted
+	mailRenderStyle _ #formatted.
+	
+	self changed: #selectedMailContents.
+	self changed: #newMailContents.! !
+
+!MailBrowser methodsFor: 'show actions' stamp: 'jpb 5/27/2021 20:14:04'!
+toggleShowRaw
+	mailRenderStyle _ #raw.
+	
+	self changed: #selectedMailContents.
+	self changed: #newMailContents.! !
+
 !MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:52:01'!
 fetchRecordsList
 	recordsList _ mailRepository findAllMailRecords.
@@ -1601,12 +1668,25 @@ formatMailMessage: aMailMessage
 	]
 	! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 18:51:23'!
+!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 21:25:46'!
+formatMailMessageRaw: aMailMessage
+	| streamer lineStreamer |
+	
+	^String streamContents: [:strStream |
+		lineStreamer _ MailLineStreamer on: strStream.
+		lineStreamer beTolerant.
+		streamer _ MailMessageStreamer new.
+		streamer setStream: lineStreamer.
+	
+		streamer nextPut: aMailMessage]! !
+
+!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 20:05:40'!
 initialize
 	super initialize.
 	
 	mailSelectionIndex _ 0.
-	recordsList _ #()! !
+	recordsList _ #().
+	mailRenderStyle _ #formatted.! !
 
 !MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 18:55:55'!
 isRefetchNeeded
@@ -1621,7 +1701,23 @@ mailRecordsList
 		
 	^recordsList! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 08:45:36'!
+!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 20:05:19'!
+renderMailMessage: aMailMessage
+	mailRenderStyle = #raw ifTrue: [ ^self formatMailMessageRaw: aMailMessage ].
+	mailRenderStyle = #formatted ifTrue: [ ^self formatMailMessage: aMailMessage ].
+	
+	self error: 'unsupported render style'! !
+
+!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/25/2021 00:40:43'!
+mailRepository: newRepository
+	mailRepository _ newRepository ! !
+
+!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/25/2021 23:16:05'!
+mailSender: newSender
+	"Overwrites a new mail sender, so that editted mails can actually be sent out"
+	mailSender _ newSender.! !
+
+!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/27/2021 20:03:01'!
 selectedMailContents	
 	| foundRecord |
 	
@@ -1629,9 +1725,9 @@ selectedMailContents
 	
 	foundRecord isEmpty ifTrue: [ ^'' ].
 
-	^self formatMailMessage: foundRecord ! !
+	^self renderMailMessage: foundRecord ! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 09:49:08'!
+!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/27/2021 09:49:08'!
 selectedMailMessage
 	| foundRecord |	
 	
@@ -1643,26 +1739,17 @@ selectedMailMessage
 	
 	^foundRecord mailMessage.! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:46:21'!
+!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/25/2021 21:46:21'!
 selectedMailRecordIndex
 	^mailSelectionIndex ! !
 
-!MailBrowser methodsFor: 'as yet unclassified' stamp: 'jpb 5/25/2021 21:46:44'!
+!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/25/2021 21:46:44'!
 selectedMailRecordIndex: aSmallInteger 
 	mailSelectionIndex _ aSmallInteger.
 	
 	
 	self changed: #selectedMailRecordIndex.
 	self changed: #selectedMailContents.! !
-
-!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/25/2021 00:40:43'!
-mailRepository: newRepository
-	mailRepository _ newRepository ! !
-
-!MailBrowser methodsFor: 'accessing' stamp: 'jpb 5/25/2021 23:16:05'!
-mailSender: newSender
-	"Overwrites a new mail sender, so that editted mails can actually be sent out"
-	mailSender _ newSender.! !
 
 !MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/27/2021 09:12:52'!
 forwardSelectedMail
@@ -1700,12 +1787,12 @@ newMail
 	
 	self changed: #newMailContents! !
 
-!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/25/2021 22:38:38'!
+!MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/27/2021 20:02:54'!
 newMailContents
 	"Returns the new mail, which is currently edited for later delivery"
 	newMailMessage isNil
 		ifTrue: [^'' ]
-		ifFalse: [ ^self formatMailMessage: newMailMessage ]! !
+		ifFalse: [ ^self renderMailMessage: newMailMessage ]! !
 
 !MailBrowser methodsFor: 'mail actions' stamp: 'jpb 5/25/2021 22:56:12'!
 newMailContents: aString
@@ -2088,6 +2175,10 @@ newHeaderNamed: headerName
 	^MailMessageHeader
 		key: (self findHeaderNameByString: headerName asString)
 		value: ''! !
+
+!MailQuery methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 19:01:20'!
+limitBy: amount
+	recordLimit _ amount! !
 
 !MailRecord methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 11:21:52'!
 forgetCachedMail
@@ -2777,14 +2868,14 @@ atFoldedLine
 	
 	^false! !
 
-!MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 5/23/2021 22:29:52'!
+!MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 21:12:45'!
 bePedantic
-	"Enables the pedantig reading mode"
+	"Enables the pedantig reading mode. When writing this means, that the line is folded when too long"
 	pedanticMode _ true.! !
 
-!MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 5/23/2021 22:29:40'!
+!MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 21:12:17'!
 beTolerant
-	"Enables the tolerant reading mode"
+	"Enables the tolerant reading mode. For writing this means automatic folding of lines"
 	pedanticMode _ false.! !
 
 !MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 4/26/2021 21:32:10'!
@@ -2857,14 +2948,23 @@ nextPut: newText
 nextPutAll: textLines
 	textLines do: [:newLine | self nextPut: newLine ].! !
 
-!MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 4/26/2021 21:30:41'!
+!MailLineStreamer methodsFor: 'as yet unclassified' stamp: 'jpb 5/27/2021 21:23:13'!
 nextPutChar: lineChar
-	linePosition > 78
-		ifTrue: [ self error: 'Line too long: ' , self streamPosition asString ].
-			
+
 	lineChar asciiValue <= 127
 		ifFalse: [ self error: 'Invalid character: ' , lineChar printString , ' ' , self streamPosition asString ].
- 		
+
+	(pedanticMode and: [ linePosition > 78 ])
+		ifTrue: [ self error: 'Line too long: ' , self streamPosition asString ].
+
+	(pedanticMode not and: [ linePosition > 78 ])
+ 		ifTrue: [ 
+			linePosition _ 1.
+			lineNumber _ lineNumber + 1.
+			currentStream nextPutAll: String crlfString.
+			currentStream nextPut: Character space.
+		].	
+		
 	currentStream nextPut: lineChar.
 	linePosition _ linePosition + 1.! !
 
