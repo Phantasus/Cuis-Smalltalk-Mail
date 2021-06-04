@@ -1,10 +1,10 @@
-'From Cuis 5.0 [latest update: #4579] on 27 May 2021 at 8:19:18 pm'!
+'From Cuis 5.0 [latest update: #4579] on 4 June 2021 at 9:31:39 pm'!
 'Description Author: Josef Philip Bernhart
 License: MIT
 
 Copyright 2021 Josef Philip Bernhart
 '!
-!provides: 'Mail-Morphs' 1 5!
+!provides: 'Mail-Morphs' 1 7!
 SystemOrganization addCategory: 'Mail-Morphs'!
 
 
